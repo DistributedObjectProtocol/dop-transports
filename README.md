@@ -2,7 +2,7 @@ Checkout of each platform directory to know how to use it
 * [JavaScript](https://github.com/DistributedObjectProtocol/transports/tree/master/javascript)
 
 
-#Browser
+### Browser
 |     | Listen | Connect |
 | ---------- |:--:| --:|
 | WebSockets    | ❌ |✅ |
@@ -11,7 +11,7 @@ Checkout of each platform directory to know how to use it
 
 
 
-# node.js
+### node.js
 |          | Listen | Connect |
 | --------------- |:--:| --:|
 | WebSockets ([ws](https://github.com/websockets/ws)) | ✅ | ✅ |
@@ -20,7 +20,7 @@ Checkout of each platform directory to know how to use it
 
 
 
-# All platforms
+## All platforms
 
 |             | Browser | node.js |
 | ----------- |:-------:| -------:|
