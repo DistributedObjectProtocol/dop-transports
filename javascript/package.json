@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Transports in JavaScript for dop",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "url": "http://www.distributedobjectprotocol.org",
   "repository": {
     "type": "git",
