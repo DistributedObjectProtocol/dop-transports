@@ -1,0 +1,23 @@
+{
+  "name": "dop-transports",
+  "version": "1.0.0",
+  "description": "Transports in JavaScript for dop",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "url": "http://www.distributedobjectprotocol.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DistributedObjectProtocol/transports.git"
+  },
+  "keywords": [
+    "dop",
+    "transports"
+  ],
+  "author": "Josema Gonzalez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DistributedObjectProtocol/transports/issues"
+  }
+}
