@@ -1,5 +1,5 @@
 Checkout of each platform directory to know how to use it
-* [JavaScript](https://github.com/DistributedObjectProtocol/transports/tree/master/JavaScript)
+* [JavaScript](https://github.com/DistributedObjectProtocol/transports/tree/master/javascript)
 
 
 #Browser
