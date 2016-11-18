@@ -1,5 +1,5 @@
 // https://github.com/websockets/ws
-var listenWebSocket = function(options, dop, listener) {
+var listenWebSocket = function(dop, listener, options) {
 
     // if (typeof options.namespace != 'string')
         // options.namespace = '/' + dop.name;
