@@ -10,11 +10,15 @@
     "url": "git+https://github.com/DistributedObjectProtocol/transports.git"
   },
   "dependencies": {
+    "ws": "^1.1.1"
   },
   "keywords": [
     "Distributed Object Protocol",
     "dop",
-    "transports"
+    "transports",
+    "WebSockets",
+    "socket.io",
+    "SockJS"
   ],
   "author": "Josema Gonzalez",
   "license": "MIT",

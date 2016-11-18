@@ -1,10 +1,10 @@
 (function(){
 
-var websocketConnect = function(node, options, dop) {
+var websocketConnect = function(options, dop, node) {
 
     var domain_prefix = /(ss|ps)?:\/\/([^\/]+)\/?(.+)?/.exec(options.url || window.location.href),
         protocol = domain_prefix[1] ? 'wss' : 'ws',
-        socket = new dop.transport.connect.WebSocket.api(protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/', domain_prefix[3] || dop.name);
+        socket = new options.transport.api(protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/', domain_prefix[3] || dop.name);
 
     socket.addEventListener('open', function() {
         dop.core.onopen(node, socket);
