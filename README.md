@@ -24,7 +24,7 @@
 
 
 
-
+<!---
 # By Platform
 
 | Browser | Listen | Connect |
@@ -38,7 +38,7 @@
 | WebSockets ([ws](https://github.com/websockets/ws)) | ✅ | ✅ |
 | [socket.io](https://github.com/socketio)       | ✅ | ✅ |
 | [SockJS](https://github.com/sockjs)          | ✅ | ✅ |
-
+-->
 
 
 
