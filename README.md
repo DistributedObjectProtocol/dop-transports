@@ -19,12 +19,17 @@
 
 
 
+# All
+
+|             | Browser | node.js |
+| ----------- |:-------:| -------:|
+| __Browser__     | - | WebSockets, [socket.io](https://github.com/socketio), [SockJS](https://github.com/sockjs)  |
+| __node.js__     | WebSockets, [socket.io](https://github.com/socketio), [SockJS](https://github.com/sockjs)  | WebSockets, [socket.io](https://github.com/socketio), [SockJS](https://github.com/sockjs)  |
 
 
 
 
-
-<!---
+<!--
 # By Platform
 
 | Browser | Listen | Connect |
@@ -39,21 +44,5 @@
 | [socket.io](https://github.com/socketio)       | ✅ | ✅ |
 | [SockJS](https://github.com/sockjs)          | ✅ | ✅ |
 -->
-
-
-
-
-
-
-
-
-
-# All
-
-|             | Browser | node.js |
-| ----------- |:-------:| -------:|
-| __Browser__     | - | WebSockets, [socket.io](https://github.com/socketio), [SockJS](https://github.com/sockjs)  |
-| __node.js__     | WebSockets, [socket.io](https://github.com/socketio), [SockJS](https://github.com/sockjs)  | WebSockets, [socket.io](https://github.com/socketio), [SockJS](https://github.com/sockjs)  |
-
 
 

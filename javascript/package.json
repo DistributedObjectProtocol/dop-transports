@@ -1,6 +1,6 @@
 {
   "name": "dop-transports",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Transports in JavaScript for dop (Distributed Object Protocol)",
   "main": "nodejs.js",
   "browser": "browser.js",
@@ -10,7 +10,8 @@
     "url": "git+https://github.com/DistributedObjectProtocol/transports.git"
   },
   "dependencies": {
-    "ws": "^1.1.1"
+    "ws": "^1.1.1",
+    "socket.io": "^1.6.0"
   },
   "keywords": [
     "Distributed Object Protocol",

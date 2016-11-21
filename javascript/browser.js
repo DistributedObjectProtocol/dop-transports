@@ -1,6 +1,7 @@
 
 module.exports = {
     connect: {
-        WebSocket: require('./browser/websocket/connect')
+        websocket: require('./connect/websocket'),
+        socketio: require('./connect/socketio')
     }
 };

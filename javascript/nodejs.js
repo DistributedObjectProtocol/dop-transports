@@ -1,6 +1,7 @@
 
 module.exports = {
     listen: {
-        WebSocket: require('./nodejs/websocket/listen')
+        websocket: require('./nodejs/listen/websocket'),
+        socketio: require('./nodejs/listen/socketio')
     }
 };
