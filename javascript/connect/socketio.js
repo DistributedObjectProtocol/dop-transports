@@ -1,7 +1,12 @@
 
-var connectSocketio = function( dop, node, options ) {
+var connectSocketio = function(dop, node, options) {
 
-    var socket = options.transport.api( options.url );
+    var url = 'ws://localhost:4445/'+dop.name;
+
+    if (typeof options.url == 'string')
+        url = options.url;
+
+    var socket = options.transport.api( url );
 
     socket.on('connect', function () {
         dop.core.onopen(node, socket);
@@ -19,7 +24,7 @@ var connectSocketio = function( dop, node, options ) {
 };
 
 
-if (typeof dop == 'undefined' && typeof module == 'object' && module.exports) {
+if (typeof module == 'object' && module.exports) {
     connectSocketio.api = require('socket.io-client');
     module.exports = connectSocketio;
 }

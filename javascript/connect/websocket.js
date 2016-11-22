@@ -1,20 +1,31 @@
 
-var dopTransportConnectWebSocket = function(dop, node, options) {
+var connectWebsocket = function(dop, node, options) {
 
-    var url = 'ws://localhost:4444/'+dop.name;
+    var url = 'ws://localhost:4444/';
 
     if (typeof options.url == 'string')
-        url = options.url;
-    else if (/http/.test(window.location.href)) {
-        var domain_prefix = /(ss|ps)?:\/\/([^\/]+)\/?(.+)?/.exec(window.location.href);
-        var protocol = domain_prefix[1] ? 'wss' : 'ws';
-        url = protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/'+dop.name;
+        url = options.url.replace('http','ws');
+    else if (typeof window!='undefined' && /http/.test(window.location.href)) {
+        var domain_prefix = /(ss|ps)?:\/\/([^\/]+)\/?(.+)?/.exec(window.location.href),
+            protocol = domain_prefix[1] ? 'wss' : 'ws';
+        url = protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/';
     }
 
-    var socket = new options.transport.api(url);
+    var socket = new options.transport.api(url),
+        send = socket.send,
+        send_queue = [];
+
+    socket.send = function(message) {
+        (socket.readyState !== 1) ?
+            send_queue.push(message)
+        :
+            send.call(socket, message);
+    };
 
     socket.addEventListener('open', function() {
         dop.core.onopen(node, socket);
+        while (send_queue.length>0)
+            send.call(socket, send_queue.shift());
     });
 
     socket.addEventListener('message', function(message) {
@@ -32,7 +43,9 @@ var dopTransportConnectWebSocket = function(dop, node, options) {
     return socket;
 };
 
-dopTransportConnectWebSocket.api = window.WebSocket;
-
-if (typeof dop == 'undefined' && typeof module == 'object' && module.exports)
-    module.exports = dopTransportConnectWebSocket;
+if (typeof dop=='undefined' && typeof module == 'object' && module.exports) {
+    connectWebsocket.api = require('ws');
+    module.exports = connectWebsocket;
+}
+else if (typeof window != 'undefined')
+    connectWebsocket.api = window.WebSocket;

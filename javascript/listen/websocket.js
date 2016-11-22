@@ -1,13 +1,13 @@
 // https://github.com/websockets/ws
 var listenWebSocket = function(dop, listener, options) {
 
-    // if (typeof options.namespace != 'string')
+    // if (typeof options.namespace != 'string') // namespaces are ignored on native WebSockets
         // options.namespace = '/' + dop.name;
 
-    // if (typeof options.httpServer != 'undefined')
-        // options.server = options.httpServer;
+    if (options.httpServer !== undefined && options.server === undefined)
+        options.server = options.httpServer;
 
-    if (typeof options.port != 'number' && typeof options.server == 'undefined')
+    if (typeof options.port != 'number' && options.server === undefined)
         options.port = 4444;
 
     var transport = new options.transport.api(options);

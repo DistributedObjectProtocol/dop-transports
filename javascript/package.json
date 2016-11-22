@@ -1,18 +1,69 @@
 {
-  "name": "dop-transports",
-  "version": "1.2.0",
-  "description": "Transports in JavaScript for dop (Distributed Object Protocol)",
-  "main": "nodejs.js",
+  "_args": [
+    [
+      {
+        "raw": "dop-transports@^1.0.0",
+        "scope": null,
+        "escapedName": "dop-transports",
+        "name": "dop-transports",
+        "rawSpec": "^1.0.0",
+        "spec": ">=1.0.0 <2.0.0",
+        "type": "range"
+      },
+      "/Users/enzo/Copy/dev/experiments/webpack-es6-demo/node_modules/dop"
+    ]
+  ],
+  "_from": "dop-transports@>=1.0.0 <2.0.0",
+  "_id": "dop-transports@1.3.0",
+  "_inCache": true,
+  "_location": "/dop-transports",
+  "_nodeVersion": "6.3.1",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/dop-transports-1.3.0.tgz_1479802304164_0.0024587553925812244"
+  },
+  "_npmUser": {
+    "name": "enzo",
+    "email": "enzo@josema.es"
+  },
+  "_npmVersion": "3.10.3",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "dop-transports@^1.0.0",
+    "scope": null,
+    "escapedName": "dop-transports",
+    "name": "dop-transports",
+    "rawSpec": "^1.0.0",
+    "spec": ">=1.0.0 <2.0.0",
+    "type": "range"
+  },
+  "_requiredBy": [
+    "/dop"
+  ],
+  "_resolved": "https://registry.npmjs.org/dop-transports/-/dop-transports-1.3.0.tgz",
+  "_shasum": "f12723c4d8dd720580ab53e1ef433ae352b555d2",
+  "_shrinkwrap": null,
+  "_spec": "dop-transports@^1.0.0",
+  "_where": "/Users/enzo/Copy/dev/experiments/webpack-es6-demo/node_modules/dop",
+  "author": {
+    "name": "Josema Gonzalez"
+  },
   "browser": "browser.js",
-  "url": "http://www.distributedobjectprotocol.org",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/DistributedObjectProtocol/transports.git"
+  "bugs": {
+    "url": "https://github.com/DistributedObjectProtocol/transports/issues"
   },
   "dependencies": {
-    "ws": "^1.1.1",
-    "socket.io": "^1.6.0"
+    "socket.io": "^1.6.0",
+    "ws": "^1.1.1"
   },
+  "description": "Transports in JavaScript for dop (Distributed Object Protocol)",
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "shasum": "f12723c4d8dd720580ab53e1ef433ae352b555d2",
+    "tarball": "https://registry.npmjs.org/dop-transports/-/dop-transports-1.3.0.tgz"
+  },
+  "homepage": "https://github.com/DistributedObjectProtocol/transports#readme",
   "keywords": [
     "Distributed Object Protocol",
     "dop",
@@ -21,9 +72,22 @@
     "socket.io",
     "SockJS"
   ],
-  "author": "Josema Gonzalez",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/DistributedObjectProtocol/transports/issues"
-  }
+  "main": "nodejs.js",
+  "maintainers": [
+    {
+      "name": "enzo",
+      "email": "enzo@josema.es"
+    }
+  ],
+  "name": "dop-transports",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DistributedObjectProtocol/transports.git"
+  },
+  "scripts": {},
+  "url": "http://www.distributedobjectprotocol.org",
+  "version": "1.3.0"
 }
