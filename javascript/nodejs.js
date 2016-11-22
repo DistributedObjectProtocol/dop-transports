@@ -1,7 +1,11 @@
 
 module.exports = {
     connect: {
-        websocket: require('./connect/websocket'),
+        websocket: (function() {
+            var transport = require('./connect/websocket');
+            transport.api = require('ws');
+            return transport;
+        })(),
         socketio: require('./connect/socketio')
     },
     listen: {
