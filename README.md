@@ -1,17 +1,20 @@
 
 # By technology
 
-| WebSockets ([ws](https://github.com/websockets/ws))  | Browser | node.js |
+### WebSockets ([ws](https://github.com/websockets/ws))
+|    | Browser | node.js |
 | ----------- |:-------:| -------:|
 | __Browser__     | ❌ | ✅  |
 | __node.js__     | ✅  | ✅  |
 
-| [socket.io](https://github.com/socketio)  | Browser | node.js |
+### [socket.io](https://github.com/socketio)
+|   | Browser | node.js |
 | ----------- |:-------:| -------:|
 | __Browser__     | ❌ | ✅  |
 | __node.js__     | ✅  | ✅  |
 
-| [SockJS](https://github.com/sockjs)  | Browser | node.js |
+### [SockJS](https://github.com/sockjs)
+|   | Browser | node.js |
 | ----------- |:-------:| -------:|
 | __Browser__     | ❌ | ✅  |
 | __node.js__     | ✅  | ✅  |
