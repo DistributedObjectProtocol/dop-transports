@@ -13,9 +13,13 @@ var listenSocketio = function socketio(dop, listener, options) {
     .of((typeof options.namespace != 'string') ? dop.name : options.namespace)
     .on('connection', function( socket ){
 
-        socket.send = listenSocketio.send;
+        socket.send = function(message) {
+            socket.emit('message', message);
+        };;
 
-        socket.close = listenSocketio.close;
+        socket.close = function( ) {
+            socket.disconnect();
+        };;
 
         dop.core.onopen(listener, socket, options.transport);
 
@@ -31,14 +35,6 @@ var listenSocketio = function socketio(dop, listener, options) {
     return transport;
 };
 
-listenSocketio.send = function(message) {
-    this.emit('message', message);
-};
-listenSocketio.close = function( ) {
-    this.disconnect();
-};
-
 listenSocketio.api = require('socket.io');
 
 module.exports = listenSocketio;
-

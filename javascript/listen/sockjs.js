@@ -21,7 +21,9 @@ var listenSockjs = function sockjs(dop, listener, options) {
 
     transport.on('connection', function(socket) {
 
-        socket.send = listenSockjs.send;
+        socket.send = function(message) {
+            socket.write(message);
+        };
 
         dop.core.onopen(listener, socket, options.transport);
 
@@ -38,11 +40,6 @@ var listenSockjs = function sockjs(dop, listener, options) {
     return transport;
 };
 
-listenSockjs.send = function(message) {
-    this.write(message);
-};
-
 listenSockjs.api = require('sockjs');
 
 module.exports = listenSockjs;
-
