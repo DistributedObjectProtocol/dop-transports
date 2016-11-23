@@ -1,5 +1,5 @@
 // http://socket.io/docs/server-api/
-var listenSocketio = function(dop, listener, options) {
+var listenSocketio = function socketio(dop, listener, options) {
 
     var transport = new options.transport.api( options.httpServer, options );
 

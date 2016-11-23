@@ -1,5 +1,5 @@
 
-var connectSocketio = function(dop, node, options) {
+var connectSocketio = function socketio(dop, node, options) {
 
     var url = 'ws://localhost:4445/'+dop.name;
 
