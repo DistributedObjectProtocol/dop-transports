@@ -1,6 +1,9 @@
 // http://socket.io/docs/server-api/
 var listenSocketio = function socketio(dop, listener, options) {
 
+    if (options.server !== undefined && options.httpServer === undefined)
+        options.httpServer = options.server;
+
     var transport = new options.transport.api( options.httpServer, options );
 
     if (typeof options.httpServer == 'undefined')
@@ -28,8 +31,8 @@ var listenSocketio = function socketio(dop, listener, options) {
     return transport;
 };
 
-listenSocketio.send = function( data ) {
-    this.emit('message', data);
+listenSocketio.send = function(message) {
+    this.emit('message', message);
 };
 listenSocketio.close = function( ) {
     this.disconnect();

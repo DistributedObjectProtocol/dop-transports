@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "ws": "^1.1.1",
-    "socket.io": "^1.6.0"
+    "socket.io": "^1.6.0",
+    "sockjs": "^0.3.18",
+    "sockjs-client": "^1.1.1"
   },
   "keywords": [
     "Distributed Object Protocol",

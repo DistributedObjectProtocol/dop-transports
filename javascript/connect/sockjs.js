@@ -1,17 +1,17 @@
 
-var connectWebsocket = function websocket(dop, node, options) {
+var connectSockjs = function sockjs(dop, node, options) {
 
-    var url = 'ws://localhost:4444/'+dop.name;
+    var url = 'http://localhost:4446/'+dop.name;
 
     if (typeof options.url == 'string')
-        url = options.url.replace('http','ws');
+        url = options.url.replace('ws','http');
     else if (typeof window!='undefined' && /http/.test(window.location.href)) {
         var domain_prefix = /(ss|ps)?:\/\/([^\/]+)\/?(.+)?/.exec(window.location.href),
-            protocol = domain_prefix[1] ? 'wss' : 'ws';
-        url = protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/'dop.name;
+            protocol = domain_prefix[1] ? 'https' : 'http';
+        url = protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/'+dop.name;
     }
 
-    var socket = new options.transport.api(url),
+    var socket = new options.transport.api(url);
         send = socket.send,
         send_queue = [];
 
@@ -36,14 +36,17 @@ var connectWebsocket = function websocket(dop, node, options) {
         dop.core.onclose(node, socket);
     });
 
-    // socket.addEventListener('error', function(error) {
-    //     dop.on.error(node, error);
+    // socket.addEventListener('error', function( error ) {
     // });
 
     return socket;
 };
 
-if (typeof dop=='undefined' && typeof module == 'object' && module.exports)
-    module.exports = connectWebsocket;
-else if (typeof window != 'undefined')
-    connectWebsocket.api = window.WebSocket;
+
+if (typeof module == 'object' && module.exports) {
+    connectSockjs.api = require('sockjs-client');
+    module.exports = connectSockjs;
+}
+else
+    sockjs.api = window.SockJS;
+    

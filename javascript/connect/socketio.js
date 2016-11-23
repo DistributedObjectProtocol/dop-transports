@@ -5,6 +5,11 @@ var connectSocketio = function socketio(dop, node, options) {
 
     if (typeof options.url == 'string')
         url = options.url;
+    else if (typeof window!='undefined' && /http/.test(window.location.href)) {
+        var domain_prefix = /(ss|ps)?:\/\/([^\/]+)\/?(.+)?/.exec(window.location.href),
+            protocol = domain_prefix[1] ? 'wss' : 'ws';
+        url = protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/'+dop.name;
+    }
 
     var socket = options.transport.api( url );
 
