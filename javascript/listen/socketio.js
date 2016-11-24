@@ -1,10 +1,10 @@
-// http://socket.io/docs/server-api/
+// https://github.com/socketio/socket.io
 var listenSocketio = function socketio(dop, listener, options) {
 
     if (options.server !== undefined && options.httpServer === undefined)
         options.httpServer = options.server;
 
-    var transport = new options.transport.api( options.httpServer, options );
+    var transport = new options.transport.api()( options.httpServer, options );
 
     if (typeof options.httpServer == 'undefined')
         transport.listen((typeof options.port != 'number') ? 4445 : options.port);
@@ -35,6 +35,8 @@ var listenSocketio = function socketio(dop, listener, options) {
     return transport;
 };
 
-listenSocketio.api = require('socket.io');
+listenSocketio.api = function() {
+    return require('socket.io');
+};
 
 module.exports = listenSocketio;

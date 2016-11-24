@@ -1,4 +1,4 @@
-
+// https://github.com/sockjs/sockjs-client
 var connectSockjs = function sockjs(dop, node, options) {
 
     var url = 'http://localhost:4446/'+dop.name;
@@ -11,7 +11,7 @@ var connectSockjs = function sockjs(dop, node, options) {
         url = protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/'+dop.name;
     }
 
-    var socket = new options.transport.api(url);
+    var socket = new options.transport.api()(url);
         send = socket.send,
         send_queue = [];
 
@@ -44,9 +44,13 @@ var connectSockjs = function sockjs(dop, node, options) {
 
 
 if (typeof module == 'object' && module.exports) {
-    connectSockjs.api = require('sockjs-client');
+    connectSockjs.api = function() { 
+        return require('sockjs-client');
+    };
     module.exports = connectSockjs;
 }
 else
-    sockjs.api = window.SockJS;
+    sockjs.api = function() { 
+        return window.SockJS;
+    };
     

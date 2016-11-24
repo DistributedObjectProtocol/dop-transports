@@ -1,4 +1,4 @@
-// http://socket.io/docs/server-api/
+// https://github.com/sockjs/sockjs-node
 var listenSockjs = function sockjs(dop, listener, options) {
 
     if (options.server !== undefined && options.httpServer === undefined)
@@ -15,7 +15,7 @@ var listenSockjs = function sockjs(dop, listener, options) {
     if (options.prefix[0] != '/')
         options.prefix = '/'+options.prefix;
 
-    var transport = options.transport.api.createServer(options);
+    var transport = options.transport.api().createServer(options);
 
     transport.installHandlers( options.httpServer, options );
 
@@ -40,6 +40,8 @@ var listenSockjs = function sockjs(dop, listener, options) {
     return transport;
 };
 
-listenSockjs.api = require('sockjs');
+listenSockjs.api = function() {
+    return require('sockjs');
+};
 
 module.exports = listenSockjs;

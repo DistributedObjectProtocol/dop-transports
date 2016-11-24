@@ -1,5 +1,5 @@
 // https://github.com/websockets/ws
-var listenWebSocket = function websocket(dop, listener, options) {
+var listenWs = function ws(dop, listener, options) {
 
     // if (typeof options.namespace != 'string') // namespaces are ignored on native WebSockets
         // options.namespace = '/' + dop.name;
@@ -10,7 +10,7 @@ var listenWebSocket = function websocket(dop, listener, options) {
     if (typeof options.port != 'number' && options.server === undefined)
         options.port = 4444;
 
-    var transport = new options.transport.api(options);
+    var transport = new options.transport.api()(options);
 
     transport.on('connection', function(socket) {
 
@@ -29,6 +29,7 @@ var listenWebSocket = function websocket(dop, listener, options) {
     return transport;
 };
 
-listenWebSocket.api = require('ws').Server;
-
-module.exports = listenWebSocket;
+listenWs.api = function() {
+    return require('ws').Server;
+};
+module.exports = listenWs;
