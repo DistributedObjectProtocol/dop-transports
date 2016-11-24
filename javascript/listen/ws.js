@@ -10,7 +10,8 @@ var listenWs = function ws(dop, listener, options) {
     if (typeof options.port != 'number' && options.server === undefined)
         options.port = 4444;
 
-    var transport = new options.transport.api()(options);
+    var api = options.transport.api(),
+        transport = new api(options);
 
     transport.on('connection', function(socket) {
 

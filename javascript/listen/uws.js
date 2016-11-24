@@ -1,5 +1,5 @@
 // https://github.com/uWebSockets/uWebSockets
-var listenUws = require('./ws');
+var listenWs = require('./ws');
 var listenUws = function uws() {
     return listenWs.apply(this, arguments);
 };

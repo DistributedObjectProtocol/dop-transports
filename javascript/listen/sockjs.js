@@ -15,7 +15,8 @@ var listenSockjs = function sockjs(dop, listener, options) {
     if (options.prefix[0] != '/')
         options.prefix = '/'+options.prefix;
 
-    var transport = options.transport.api().createServer(options);
+    var api = options.transport.api(),
+        transport = new api.createServer(options);
 
     transport.installHandlers( options.httpServer, options );
 

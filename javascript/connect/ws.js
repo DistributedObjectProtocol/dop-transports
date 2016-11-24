@@ -5,6 +5,6 @@ var connectWs = function ws() {
 };
 
 connectWs.api = function() { 
-        return require('ws');
+    return require('ws');
 };
 module.exports = connectWs;

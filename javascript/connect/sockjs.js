@@ -11,7 +11,8 @@ var connectSockjs = function sockjs(dop, node, options) {
         url = protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/'+dop.name;
     }
 
-    var socket = new options.transport.api()(url);
+    var api = options.transport.api(),
+        socket = new api(url);
         send = socket.send,
         send_queue = [];
 

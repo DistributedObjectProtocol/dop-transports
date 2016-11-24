@@ -4,7 +4,8 @@ var listenSocketio = function socketio(dop, listener, options) {
     if (options.server !== undefined && options.httpServer === undefined)
         options.httpServer = options.server;
 
-    var transport = new options.transport.api()( options.httpServer, options );
+    var api = options.transport.api(),
+        transport = new api( options.httpServer, options );
 
     if (typeof options.httpServer == 'undefined')
         transport.listen((typeof options.port != 'number') ? 4445 : options.port);

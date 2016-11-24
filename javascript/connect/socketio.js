@@ -11,7 +11,8 @@ var connectSocketio = function socketio(dop, node, options) {
         url = protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/'+dop.name;
     }
 
-    var socket = options.transport.api()( url );
+    var api = options.transport.api(),
+        socket = new api( url );
 
     socket.on('connect', function () {
         dop.core.onopen(node, socket);
