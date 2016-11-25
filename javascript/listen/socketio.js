@@ -1,5 +1,5 @@
 // https://github.com/socketio/socket.io
-var listenSocketio = function socketio(dop, listener, options) {
+function socketio(dop, listener, options) {
 
     if (options.server !== undefined && options.httpServer === undefined)
         options.httpServer = options.server;
@@ -36,8 +36,5 @@ var listenSocketio = function socketio(dop, listener, options) {
     return transport;
 };
 
-listenSocketio.api = function() {
-    return require('socket.io');
-};
-
-module.exports = listenSocketio;
+socketio.api = function() { return require('socket.io') };
+module.exports = socketio;

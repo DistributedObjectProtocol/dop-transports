@@ -1,5 +1,6 @@
 // https://github.com/socketio/socket.io
-var connectSocketio = function socketio(dop, node, options) {
+(function(root){
+function socketio(dop, node, options) {
 
     var url = 'ws://localhost:4445/'+dop.name;
 
@@ -31,13 +32,16 @@ var connectSocketio = function socketio(dop, node, options) {
 
 
 if (typeof module == 'object' && module.exports) {
-    connectSocketio.api = function() { 
-        return require('socket.io-client');
-    };
-    module.exports = connectSocketio;
+    socketio.api = function() { return require('socket.io-client') };
+    module.exports = socketio;
 }
-else
-    connectSocketio.api = function() { 
-        return window.io;
-    };
+else {
+    socketio.api = function() { return window.io };
+    (typeof dop != 'undefined') ?
+        dop.transports.connect.socketio = socketio
+    :
+        root.dopTransportsConnectSocketio = socketio;
+}
+
+})(this);
     

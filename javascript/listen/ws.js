@@ -1,5 +1,5 @@
 // https://github.com/websockets/ws
-var listenWs = function ws(dop, listener, options) {
+function ws(dop, listener, options) {
 
     // if (typeof options.namespace != 'string') // namespaces are ignored on native WebSockets
         // options.namespace = '/' + dop.name;
@@ -30,7 +30,5 @@ var listenWs = function ws(dop, listener, options) {
     return transport;
 };
 
-listenWs.api = function() {
-    return require('ws').Server;
-};
-module.exports = listenWs;
+ws.api = function() { return require('ws').Server };
+module.exports = ws;

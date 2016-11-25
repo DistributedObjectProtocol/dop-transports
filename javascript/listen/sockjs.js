@@ -1,5 +1,5 @@
 // https://github.com/sockjs/sockjs-node
-var listenSockjs = function sockjs(dop, listener, options) {
+function sockjs(dop, listener, options) {
 
     if (options.server !== undefined && options.httpServer === undefined)
         options.httpServer = options.server;
@@ -41,8 +41,5 @@ var listenSockjs = function sockjs(dop, listener, options) {
     return transport;
 };
 
-listenSockjs.api = function() {
-    return require('sockjs');
-};
-
-module.exports = listenSockjs;
+sockjs.api = function() { return require('sockjs') };
+module.exports = sockjs;
