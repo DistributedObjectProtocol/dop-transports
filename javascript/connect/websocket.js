@@ -13,7 +13,7 @@ function websocket(dop, node, options) {
 
     var api = options.transport.api(),
         socket = new api(url),
-        send = socket.send];
+        send = socket.send;
 
     socket.send = function(message) {
         send.call(socket, message);
