@@ -7,10 +7,19 @@ function local(dop, node, options) {
         listener.onsend(socket, message);
         },10);
     };
-    socket.close = function(){};
+    socket.close = function(){
+        setTimeout(function(){
+        socket.onclose();
+        listener.onclose(socket);
+        },10);  
+    };
     socket.onsend = function(message) {
         dop.core.onmessage(node, socket, message);
         socket.emit('message', message);
+    };
+    socket.onclose = function(message) {
+        dop.core.onclose(node, socket);
+        socket.emit('close');
     };
     setTimeout(function(){
         listener.connection(socket);

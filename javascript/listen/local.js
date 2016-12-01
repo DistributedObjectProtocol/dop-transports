@@ -9,7 +9,12 @@ function local(dop, listener, options) {
                 socketClient.onsend(message);
             },10)
         };
-        socket.close = function(){};
+        socket.close = function(){
+            setTimeout(function(){
+                socketClient.onclose();
+                transport.onclose(socketClient);
+            },10)
+        };
         dop.core.onopen(listener, socket, options.transport);
         transport.emit('connection', socket);
     };
@@ -17,7 +22,10 @@ function local(dop, listener, options) {
         dop.core.onmessage(listener, socketClient.socket, message);
         socketClient.socket.emit('message', message);
     };
-    
+    transport.onclose = function(socketClient) {
+        dop.core.onclose(listener, socketClient.socket);
+        socketClient.socket.emit('close');
+    };
 
     return transport;
 };
