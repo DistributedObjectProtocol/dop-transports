@@ -1,20 +1,22 @@
 (function(root){
 function local(dop, node, options) {
-    var listener = options.listener.transport;
+    var listener = options.listener.listener;
     var socket = new dop.util.emitter();
     socket.send = function(message){
-        // listener.on
+        setTimeout(function(){
+        listener.onsend(socket, message);
+        },10);
     };
     socket.close = function(){};
     socket.onsend = function(message) {
-        socket.emit('message', message);
         dop.core.onmessage(node, socket, message);
+        socket.emit('message', message);
     };
     setTimeout(function(){
         listener.connection(socket);
-        socket.emit('open');
         dop.core.onopen(node, socket);
-    },0);
+        socket.emit('open');
+    },10);
 
     return socket;
 };

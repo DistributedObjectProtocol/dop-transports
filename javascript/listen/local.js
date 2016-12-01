@@ -3,15 +3,19 @@ function local(dop, listener, options) {
     var transport = new dop.util.emitter();
     transport.connection = function(socketClient) {
         var socket = new dop.util.emitter();
+        socketClient.socket = socket;
         socket.send = function(message){
-            socketClient.onsend(message);
+            setTimeout(function(){
+                socketClient.onsend(message);
+            },10)
         };
         socket.close = function(){};
-        transport.emit('connection', socket);
         dop.core.onopen(listener, socket, options.transport);
+        transport.emit('connection', socket);
     };
-    transport.onsend = function(message) {
-        dop.core.onmessage(listener, socket, message);
+    transport.onsend = function(socketClient, message) {
+        dop.core.onmessage(listener, socketClient.socket, message);
+        socketClient.socket.emit('message', message);
     };
     
 
