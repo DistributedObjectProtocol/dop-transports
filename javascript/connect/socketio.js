@@ -16,7 +16,7 @@ function socketio(dop, node, options) {
         socket = new api( url );
 
     socket.on('connect', function () {
-        dop.core.onopen(node, socket);
+        dop.core.onopenClient(node, socket);
     });
 
     socket.on('message', function ( message ) {
@@ -24,7 +24,7 @@ function socketio(dop, node, options) {
     });
 
     socket.on('disconnect', function () {
-        dop.core.onclose(node, socket);
+        dop.core.oncloseClient(node, socket);
     });
 
     return socket;

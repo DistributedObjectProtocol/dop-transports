@@ -22,14 +22,14 @@ function socketio(dop, listener, options) {
             socket.disconnect();
         };;
 
-        dop.core.onopen(listener, socket, options.transport);
+        dop.core.onopenServer(listener, socket, options.transport);
 
         socket.on('message', function(message){
             dop.core.onmessage(listener, socket, message);
         });
 
         socket.on('disconnect', function(){
-            dop.core.onclose(listener, socket);
+            dop.core.oncloseServer(listener, socket);
         });
     });
 
