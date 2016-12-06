@@ -12,61 +12,53 @@ function websocket(dop, node, options) {
         url = protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/'+dop.name;
     }
 
-    var api = options.transport.api(),
+
+    var api = options.transport.getApi(),
         socket = new api(url),
         oldSocket,
-        send_queue = [],
-        send = socket.send,
-        close = socket.close;
+        send_queue = [];
     
-    node.readyState = dop.CONS.CLOSE;
-    node.once('connect', function() {
-        node.readyState = dop.CONS.CONNECT;
+
+    // We use this function as alias to store sends when connection is not OPEN
+    function send(message) {
+        (socket.readyState === socket.constructor.OPEN) ? 
+            socket.send(message)
+        : 
+            send_queue.push(message);
+    }
+
+    // node.readyState = dop.CONS.CLOSE;
+    // node.reconnect = function() {
+    //     oldSocket = node.socket;
+    //     node.socket = node.options.transport.apply(node, args);
+    //     node.readyState = dop.CONS.RECONNECT;
+    //     send(node.tokenServer);
+    // };
+    node.on(dop.CONS.SEND, function(message) {
+        send(message);
+    });
+    node.on(dop.CONS.DISCONNECT, function() {
+        node.readyState = dop.CONS.CLOSE;
+        socket.close();
     });
 
-    node.reconnect = function() {
-        oldSocket = node.socket;
-        node.socket = node.options.transport.apply(node, args);
-        node.readyState = dop.CONS.RECONNECT;
-        socket.send(node.tokenServer);
-    };
 
-    socket.send = function(message) {
-        if (socket.readyState === api.OPEN)
-            return send.call(socket, message);
-        else
-            send_queue.push(message);
-    };
-
-    socket.close = function() {
-        node.readyState = dop.CONS.CLOSE;
-        return close.call(socket);
-    };
 
     socket.addEventListener('open', function() {
         node.readyState = dop.CONS.OPEN;
-        while (send_queue.length>0)
-            send.call(socket, send_queue.shift());
-        dop.core.onOpenClient(node, socket);
+        send(); // Empty means we want to get connected, the token means reconnect
+        dop.core.onOpenClient(node, socket, options.transport);
     });
-
     socket.addEventListener('message', function(message) {
-        if (message.data === node.token) {
-            console.log( 'RECONNECTING?' );
-        }
-        dop.core.onMessageClient(node, socket, message.data, message);
+        dop.core.emitMessage(node, message.data, message);
     });
-
     socket.addEventListener('close', function() {
-        dop.core.onCloseClient(node, socket);
+        dop.core.emitClose(node);
         // If node.readyState === dop.CONS.CLOSE means node.disconnect() has been called and we DON'T try to reconnect
-        if (node.readyState === dop.CONS.CLOSE)
-            dop.core.onDisconnectClient(node, socket);
+        // if (node.readyState === dop.CONS.CLOSE)
+            // dop.core.onDisconnectClient(node, socket);
     });
 
-    // socket.addEventListener('error', function(error) {
-    //     dop.on.error(node, error);
-    // });
 
     return socket;
 };
@@ -74,7 +66,7 @@ function websocket(dop, node, options) {
 if (typeof dop=='undefined' && typeof module == 'object' && module.exports)
     module.exports = websocket;
 else {
-    websocket.api = function() { return window.WebSocket };
+    websocket.getApi = function() { return window.WebSocket };
     (typeof dop != 'undefined') ?
         dop.transports.connect.websocket = websocket
     :

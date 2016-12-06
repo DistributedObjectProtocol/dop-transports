@@ -4,5 +4,5 @@ function ws() {
     return connectWebsocket.apply(this, arguments);
 };
 
-ws.api = function() { return require('ws') };
+ws.getApi = function() { return require('ws') };
 module.exports = ws;
