@@ -1,0 +1,14 @@
+<script src="../../../dop/dist/browser.js"></script>
+<script src="../../../transports/javascript/connect/sockjs.js"></script>
+<script src="../../../transports/javascript/connect/socketio.js"></script>
+<script src="../../../static/sockjs.min.js"></script>
+<script src="../../../static/socket.io.js"></script>
+<script type="text/javascript">
+
+let node3 = dop.connect({transport:dop.transports.connect.socketio})
+node3.on('open', ()=>console.log('socketio opened'))
+node3.on('message', (socket, message)=>console.log('socketio message', message))
+node3.on('close', ()=>console.log('socketio closed'))
+node3.send('browser cdn: start!');
+setInterval(()=>{node3.send('browser cdn: '+new Date().toString())}, 5000)
+</script>

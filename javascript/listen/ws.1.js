@@ -1,8 +1,5 @@
 // https://github.com/websockets/ws
 function ws(dop, listener, options) {
-        
-    // https://github.com/websockets/ws/issues/923
-    options.perMessageDeflate = false; 
 
     // Defaults
     if (options.httpServer !== undefined && options.server === undefined)
@@ -13,81 +10,69 @@ function ws(dop, listener, options) {
         options.timeout = 60; // seconds
     // if (typeof options.namespace != 'string') // namespaces are ignored on native WebSockets
         // options.namespace = '/' + dop.name;
-
+    
 
     // Creating instance of the (let WebSocketServer = new WebSocketServer() https://github.com/websockets/ws)
-    var api = options.transport.getApi(),
+    var api = options.transport.api(),
         transport = new api(options);
 
+    
     // Listening for new raw connections
     transport.on('connection', function(socket) {
 
-        // We emit the connection and create the a new node instance
-        var node = dop.core.emitOpen(listener, socket, options.transport),
+        var node = dop.core.onOpenServer(listener, socket, options.transport),
             send_queue = [];
 
-        // We use this function as alias to store messages when connection is not OPEN
+        // We use this function as alias to store sends when connection is not OPEN
         function send(message) {
-            (socket.readyState === socket.constructor.OPEN) ? 
-                socket.send(message)
-            : 
-                send_queue.push(message);
+            (socket.readyState === socket.constructor.OPEN) ? socket.send(message) : send_queue.push(message);
         }
 
-        // Set node as OPEN
         node.readyState = dop.CONS.OPEN;
-        node.once(dop.CONS.CONNECT, function() {
+        node.once('connect', function() {
             node.readyState = dop.CONS.CONNECT;
-            dop.core.emitConnect(node);
         });
-        node.on(dop.CONS.SEND, function(message) {
-            send(message);
+        node.on('send', function(message) {
+            send(node.tokenServer);
         });
-        node.on(dop.CONS.DISCONNECT, function() {
+        node.on('close', function() {
             node.readyState = dop.CONS.CLOSE;
             socket.close();
         });
-
 
 
         socket.on('message', function(message) {
             // Checking if client is trying to reconnect
             var oldNode = dop.data.node[message];
             if (oldNode != undefined && oldNode.readyState === dop.CONS.RECONNECT && node.readyState === dop.CONS.OPEN) {
-                send(message); // Sending same token/message to confirm the reconnection
                 node.readyState = dop.CONS.CLOSE;
                 oldNode.readyState = dop.CONS.CONNECT;
                 clearTimeout(oldNode.timeoutReconnection);
                 delete oldNode.timeoutReconnection;
-                dop.core.emitReconnect(oldNode, node);
-                node = oldNode;
+                dop.core.onReconnectServer(listener, oldNode, node);
+                send.call(socket, message);
+                while (send_queue.length>0)
+                    send(send_queue.shift());
             }
-            else {
-                // Emitting message
-                dop.core.emitMessage(node, message);
-                // We send instrunction to connect with client
-                if (node.readyState === dop.CONS.OPEN)
-                    dop.core.sendConnect(node);
-            }
+            else
+                dop.core.onMessageServer(listener, socket, message);
         });
         socket.on('close', function() {
-            dop.core.emitClose(node);
+            dop.core.onCloseServer(listener, socket);
             // If node.readyState === dop.CONS.CLOSE means node.disconnect() has been called and we DON'T try to reconnect
             if (node.readyState === dop.CONS.CLOSE)
-                dop.core.emitDisconnect(node);
+                dop.core.onDisconnectServer(listener, socket);
             // We setup node as reconnecting
             else if (node.readyState === dop.CONS.CONNECT) {
-                node.timeoutReconnection = setTimeout(
-                    dop.core.emitDisconnect.bind(this, node),
-                    options.timeout*1000
-                );
+                node.timeoutReconnection = setTimeout(dop.core.onDisconnectServer.bind(this, listener, socket), options.timeout*1000);
                 node.readyState = dop.CONS.RECONNECT;
             }
         });
+
     });
 
     return transport;
 };
 
-ws.getApi = function() { return require('ws').Server };
+ws.api = function() { return require('ws').Server };
 module.exports = ws;

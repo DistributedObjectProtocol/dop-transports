@@ -13,17 +13,15 @@ function websocket(dop, node, options) {
     }
 
 
-    var api = options.transport.getApi(),
+    var api = options.transport.api(),
         socket = new api(url),
+        oldSocket,
         send_queue = [];
     
 
-    // We use this function as alias to store messages when connection is not OPEN
+    // We use this function as alias to store sends when connection is not OPEN
     function send(message) {
-        (socket.readyState === socket.constructor.OPEN) ? 
-            socket.send(message)
-        : 
-            send_queue.push(message);
+        (socket.readyState === socket.constructor.OPEN) ? socket.send(message) : send_queue.push(message);
     }
 
     node.readyState = dop.CONS.CLOSE;
@@ -31,15 +29,15 @@ function websocket(dop, node, options) {
         oldSocket = node.socket;
         node.socket = node.options.transport.apply(node, args);
         node.readyState = dop.CONS.RECONNECT;
+        send(node.tokenServer);
     };
-    node.once(dop.CONS.CONNECT, function() {
+    node.once('connect', function() {
         node.readyState = dop.CONS.CONNECT;
-        dop.core.emitConnect(node);
     });
-    node.on(dop.CONS.SEND, function(message) {
+    node.on('send', function(message) {
         send(message);
     });
-    node.on(dop.CONS.DISCONNECT, function() {
+    node.on('close', function() {
         node.readyState = dop.CONS.CLOSE;
         socket.close();
     });
@@ -47,30 +45,22 @@ function websocket(dop, node, options) {
 
 
     socket.addEventListener('open', function() {
-        // Reconnect
-        if (node.readyState === dop.CONS.RECONNECT)
-            send(node.tokenServer)
-        // Connect
-        else {
-            send(); // Empty means we want to get connected
-            node.readyState = dop.CONS.OPEN;
-        }
+        node.readyState = dop.CONS.OPEN;
+        while (send_queue.length>0)
+            send(send_queue.shift());
         dop.core.onOpenClient(node, socket, options.transport);
     });
     socket.addEventListener('message', function(message) {
-        // Reconnecting
-        if (message.data===node.tokenServer && node.readyState===dop.CONS.RECONNECT) {
-            node.readyState = dop.CONS.CONNECT;
-            dop.core.emitReconnectClient(node, oldSocket);
+        if (message.data === node.token) {
+            console.log( 'RECONNECTING?' );
         }
-        else
-            dop.core.emitMessage(node, message.data, message);
+        dop.core.onMessageClient(node, socket, message.data, message);
     });
     socket.addEventListener('close', function() {
-        dop.core.emitClose(node);
+        dop.core.onCloseClient(node, socket);
         // If node.readyState === dop.CONS.CLOSE means node.disconnect() has been called and we DON'T try to reconnect
         if (node.readyState === dop.CONS.CLOSE)
-            dop.core.emitDisconnect(node);
+            dop.core.onDisconnectClient(node, socket);
     });
 
 
@@ -80,7 +70,7 @@ function websocket(dop, node, options) {
 if (typeof dop=='undefined' && typeof module == 'object' && module.exports)
     module.exports = websocket;
 else {
-    websocket.getApi = function() { return window.WebSocket };
+    websocket.api = function() { return window.WebSocket };
     (typeof dop != 'undefined') ?
         dop.transports.connect.websocket = websocket
     :
