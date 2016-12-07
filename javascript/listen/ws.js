@@ -62,16 +62,15 @@ function ws(dop, listener, options) {
                 dop.core.emitReconnect(oldNode, node);
                 node = oldNode;
             }
-            else {
-                // Emitting message
-                dop.core.emitMessage(node, message);
-                // We send instrunction to connect with client
-                if (node.readyState === dop.CONS.OPEN)
-                    dop.core.sendConnect(node);
-            }
+            // We send instrunction to connect with client
+            else if (node.readyState === dop.CONS.OPEN && message==='')
+                dop.core.sendConnect(node);
+            // Emitting message
+            else
+                dop.core.emitMessage(node, socket, message);
         });
         socket.on('close', function() {
-            dop.core.emitClose(node);
+            dop.core.emitClose(node, socket);
             // If node.readyState === dop.CONS.CLOSE means node.disconnect() has been called and we DON'T try to reconnect
             if (node.readyState === dop.CONS.CLOSE)
                 dop.core.emitDisconnect(node);
