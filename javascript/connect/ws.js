@@ -4,5 +4,9 @@ function ws() {
     return connectWebsocket.apply(this, arguments);
 };
 
-ws.getApi = function() { return require('ws') };
+ws.getApi = function() { 
+    var api = require('ws');
+    api.prototype.removeEventListener = api.prototype.removeListener;
+    return api;
+};
 module.exports = ws;
