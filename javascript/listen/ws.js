@@ -37,7 +37,7 @@ function ws(dop, listener, options) {
 
         // Set node as OPEN
         node.readyState = dop.CONS.OPEN;
-        node.once(dop.CONS.CONNECT, function() {
+        node.on(dop.CONS.CONNECT, function() {
             node.readyState = dop.CONS.CONNECT;
             dop.core.emitConnect(node);
         });
@@ -63,12 +63,13 @@ function ws(dop, listener, options) {
                 dop.core.emitReconnect(oldNode, node);
                 node = oldNode;
             }
-            // We send instrunction to connect with client
-            else if (node.readyState === dop.CONS.OPEN && message==='')
-                dop.core.sendConnect(node);
-            // Emitting message
-            else
+            else {
+                // Emitting message
                 dop.core.emitMessage(node, socket, message);
+                // We send instrunction to connect with client
+                if (node.readyState === dop.CONS.OPEN)
+                    dop.core.sendConnect(node);
+            }
         });
         socket.on('close', function() {
             dop.core.emitClose(node, socket);
