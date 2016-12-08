@@ -1,9 +1,6 @@
 // https://github.com/websockets/ws
 function ws(dop, listener, options) {
         
-    // https://github.com/websockets/ws/issues/923
-    options.perMessageDeflate = false; 
-
     // Defaults
     if (options.httpServer !== undefined && options.server === undefined)
         options.server = options.httpServer;
@@ -14,10 +11,13 @@ function ws(dop, listener, options) {
     // if (typeof options.namespace != 'string') // namespaces are ignored on native WebSockets
         // options.namespace = '/' + dop.name;
 
+    options.perMessageDeflate = false; // https://github.com/websockets/ws/issues/923
+
 
     // Creating instance of the (let WebSocketServer = new WebSocketServer() https://github.com/websockets/ws)
     var api = options.transport.getApi(),
         transport = new api(options);
+
 
     // Listening for new raw connections
     transport.on('connection', function(socket) {
@@ -28,10 +28,11 @@ function ws(dop, listener, options) {
 
         // We use this function as alias to store messages when connection is not OPEN
         function send(message) {
-            (socket.readyState === socket.constructor.OPEN) ? 
-                socket.send(message)
-            : 
-                send_queue.push(message);
+            (socket.readyState === socket.constructor.OPEN) ? socket.send(message) : send_queue.push(message);
+        }
+        function sendQueue(message) {
+            while (send_queue.length>0)
+                send(send_queue.shift());
         }
 
         // Set node as OPEN

@@ -4,5 +4,5 @@ function uws() {
     return listenWs.apply(this, arguments);
 };
 
-uws.api = function() { return require('uws').Server };
+uws.getApi = function() { return require('uws').Server };
 module.exports = uws;
