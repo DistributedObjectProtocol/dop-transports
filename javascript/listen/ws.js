@@ -19,10 +19,10 @@ function ws(dop, listener, options) {
         transport = new api(options);
 
 
-    // Listening for new raw connections
+    // Listening for sockets connections
     transport.on('connection', function(socket) {
 
-        // We emit the connection and create the a new node instance
+        // We emit the connection and create a new node instance
         var node = dop.core.emitOpen(listener, socket, options.transport),
             send_queue = [];
 
@@ -64,8 +64,11 @@ function ws(dop, listener, options) {
                 node = oldNode;
             }
             else {
+                
                 // Emitting message
-                dop.core.emitMessage(node, socket, message);
+                if (!(node.readyState===dop.CONS.OPEN && message===''))
+                    dop.core.emitMessage(node, socket, message);
+
                 // We send instrunction to connect with client
                 if (node.readyState === dop.CONS.OPEN)
                     dop.core.sendConnect(node);
