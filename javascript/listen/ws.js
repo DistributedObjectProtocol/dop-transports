@@ -26,7 +26,7 @@ function ws(dop, listener, options) {
         var node = dop.core.emitOpen(listener, socket, options.transport),
             send_queue = [];
 
-        // We use this function as alias to store messages when connection is not OPEN
+        // Helpers
         function send(message) {
             (socket.readyState === socket.constructor.OPEN) ? socket.send(message) : send_queue.push(message);
         }
@@ -35,23 +35,8 @@ function ws(dop, listener, options) {
                 send(send_queue.shift());
         }
 
-        // Set node as OPEN
-        node.readyState = dop.CONS.OPEN;
-        node.on(dop.CONS.CONNECT, function() {
-            node.readyState = dop.CONS.CONNECT;
-            dop.core.emitConnect(node);
-        });
-        node.on(dop.CONS.SEND, function(message) {
-            send(message);
-        });
-        node.on(dop.CONS.DISCONNECT, function() {
-            node.readyState = dop.CONS.CLOSE;
-            socket.close();
-        });
-
-
-
-        socket.on('message', function(message) {
+        // Socket events
+        function onmessage(message) {
             // Checking if client is trying to reconnect
             var oldNode = dop.data.node[message];
             if (oldNode != undefined && oldNode.readyState === dop.CONS.RECONNECT && node.readyState === dop.CONS.OPEN) {
@@ -60,21 +45,22 @@ function ws(dop, listener, options) {
                 oldNode.readyState = dop.CONS.CONNECT;
                 clearTimeout(oldNode.timeoutReconnection);
                 delete oldNode.timeoutReconnection;
-                dop.core.emitReconnect(oldNode, node);
+                var oldSocket = oldNode.socket;
+                dop.core.setSocketToNode(node, socket);
+                dop.core.emitReconnect(oldNode, oldSocket, node);
                 node = oldNode;
             }
             else {
-                
                 // Emitting message
                 if (!(node.readyState===dop.CONS.OPEN && message===''))
-                    dop.core.emitMessage(node, socket, message);
+                    dop.core.emitMessage(node, message);
 
                 // We send instrunction to connect with client
                 if (node.readyState === dop.CONS.OPEN)
                     dop.core.sendConnect(node);
             }
-        });
-        socket.on('close', function() {
+        }
+        function onclose() {
             dop.core.emitClose(node, socket);
             // If node.readyState === dop.CONS.CLOSE means node.disconnect() has been called and we DON'T try to reconnect
             if (node.readyState === dop.CONS.CLOSE)
@@ -87,7 +73,28 @@ function ws(dop, listener, options) {
                 );
                 node.readyState = dop.CONS.RECONNECT;
             }
-        });
+        }
+
+
+        // dop events
+        function onconnect() {
+            node.readyState = dop.CONS.CONNECT;
+            dop.core.emitConnect(node);
+        }
+        function ondisconnect() {
+            node.readyState = dop.CONS.CLOSE;
+            socket.close();
+        }
+
+
+        // Setting up
+        dop.core.setSocketToNode(node, socket);
+        node.readyState = dop.CONS.OPEN;
+        node.on(dop.CONS.CONNECT, onconnect);
+        node.on(dop.CONS.SEND, send);
+        node.on(dop.CONS.DISCONNECT, ondisconnect);
+        socket.on('message', onmessage);
+        socket.on('close', onclose);
     });
 
     return transport;
