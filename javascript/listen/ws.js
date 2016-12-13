@@ -13,7 +13,6 @@ function ws(dop, listener, options) {
 
     options.perMessageDeflate = false; // https://github.com/websockets/ws/issues/923
 
-
     // Creating instance of the (let WebSocketServer = new WebSocketServer() https://github.com/websockets/ws)
     var api = options.transport.getApi(),
         transport = new api(options),
@@ -36,6 +35,7 @@ function ws(dop, listener, options) {
 
         // Socket events
         function onmessage(message) {
+            // console.log( 'S<<: `'+message+'`' );
             var oldClient = clients[message];
             // Emitting message
             if (client.readyState === dop.CONS.CONNECT || client.readyState === dop.CONS.CONNECTING)
@@ -47,8 +47,8 @@ function ws(dop, listener, options) {
                 node.removeListener(dop.CONS.SEND, send);
                 node.removeListener(dop.CONS.DISCONNECT, ondisconnect);
                 send(message); // Sending same token/message to confirm the reconnection
-                oldClient.onReconnect(socket);
                 dop.core.emitReconnect(oldClient.node, oldClient.socket, node);
+                oldClient.onReconnect(socket);
                 delete clients[node.token];
                 node = oldClient.node;
                 client = oldClient;
@@ -68,7 +68,7 @@ function ws(dop, listener, options) {
             // We setup node as reconnecting
             else if (client.readyState === dop.CONS.CONNECT) {
                 client.timeoutReconnection = setTimeout(
-                    dop.core.emitDisconnect.bind(this, node),
+                    ontimeout,
                     options.timeout*1000
                 );
                 client.readyState = dop.CONS.CONNECTING;
@@ -89,6 +89,13 @@ function ws(dop, listener, options) {
             socket.close();
         }
 
+        function ontimeout() {
+            delete clients[node.token];
+            node.removeListener(dop.CONS.CONNECT, onconnect);
+            node.removeListener(dop.CONS.SEND, send);
+            node.removeListener(dop.CONS.DISCONNECT, ondisconnect);
+            dop.core.emitDisconnect(node);
+        }
 
 
 
