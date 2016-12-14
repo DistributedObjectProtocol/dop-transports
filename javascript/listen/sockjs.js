@@ -138,11 +138,7 @@ function sockjs(dop, listener, options) {
 var CLOSE = 0,
     OPEN = 1,
     CONNECTING = 2,
-    CONNECT = 3,
-
-    CONNECTING = 0,
-    CLOSING = 2,
-    CLOSED = 3;
+    CONNECT = 3;
 
 
 sockjs.getApi = function() { return require('sockjs') };
