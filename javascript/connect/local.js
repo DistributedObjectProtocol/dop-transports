@@ -50,12 +50,11 @@ function local(dop, node, options) {
     }
 
     // dop events
-    function onconnect(message_response) {
+    function onconnect() {
         if (readyState === CONNECTING) {
             dop.core.emitDisconnect(node);
             dop.core.setSocketToNode(node, socket);
         }
-        send(message_response);
         readyState = CONNECT;
         dop.core.emitConnect(node);
         sendQueue();
@@ -111,11 +110,13 @@ function api(dop, server) {
     };
     socket.server.readyState = socket.client.readyState = CLOSE;
     socket.server.send = function(message) {
+        // console.log( 'S',message );
         setTimeout(function(){
             socket.client.emit('message', message);
         },50)
     };
     socket.client.send = function(message) {
+        // console.log( 'C',message );
         setTimeout(function(){
             socket.server.emit('message', message);
         },50)
