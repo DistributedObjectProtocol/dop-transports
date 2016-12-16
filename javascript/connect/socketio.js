@@ -14,7 +14,7 @@ function socketio(dop, node, options) {
 
     // Variables
     var api = options.transport.getApi(),
-        socket = new api(url),
+        socket = new api(url, {reconnection:false}),
         send_queue = [],
         readyState;
     

@@ -1,34 +1,141 @@
 (function(root){
 function local(dop, node, options) {
-    var listener = options.listener.listener;
-    var socket = new dop.util.emitter();
-    socket.send = function(message){
-        setTimeout(function(){
-        listener.onsend(socket, message);
-        },10);
-    };
-    socket.close = function(){
-        setTimeout(function(){
-        socket.onclose();
-        listener.onclose(socket);
-        },10);  
-    };
-    socket.onsend = function(message) {
-        dop.core.onmessage(node, socket, message);
-        socket.emit('message', message);
-    };
-    socket.onclose = function(message) {
-        dop.core.onclose(node, socket);
-        socket.emit('close');
-    };
-    setTimeout(function(){
-        listener.connection(socket);
-        dop.core.onopen(node, socket);
-        socket.emit('open');
-    },10);
+    var server = options.listener.listener,
+        sockets = api(dop, server),
+        socket = sockets.client,
+        send_queue = [],
+        readyState;
 
-    return socket;
+
+    // Helpers
+    function send(message) {
+        (socket.readyState===OPEN && readyState===CONNECT) ?
+            socket.send(message)
+        :
+            send_queue.push(message); 
+    }
+    function sendQueue() {
+        if (socket.readyState===OPEN)
+            while (send_queue.length>0)
+                socket.send(send_queue.shift());
+    }
+
+    // Socket events
+    function onopen() {
+        // Reconnect
+        if (readyState === CONNECTING)
+            socket.send(node.tokenServer);
+        // Connect
+        else {
+            socket.send(''); // Empty means we want to get connected
+            readyState = OPEN;
+        }
+        dop.core.emitOpen(node, socket, options.transport);
+    }
+    function onmessage(message) {
+        // console.log( 'C<<: `'+message.data+'`' );
+        // Reconnecting
+        if (readyState===CONNECTING && message===node.tokenServer) {
+            readyState = CONNECT;
+            dop.core.setSocketToNode(node, socket);
+            dop.core.emitReconnect(node, oldSocket);
+            sendQueue();
+        }
+        else
+            dop.core.emitMessage(node, message);
+    }
+    function onclose() {
+        readyState = CLOSE;
+        dop.core.emitClose(node, socket);
+    }
+
+    // dop events
+    function onconnect(message_response) {
+        if (readyState === CONNECTING) {
+            dop.core.emitDisconnect(node);
+            dop.core.setSocketToNode(node, socket);
+        }
+        send(message_response);
+        readyState = CONNECT;
+        dop.core.emitConnect(node);
+        sendQueue();
+    }
+    function ondisconnect() {
+        readyState = CLOSE;
+        socket.close();
+    }
+
+    function reconnect() {
+        if (readyState === CLOSE) {
+            oldSocket = socket;
+            sockets = api(dop, server);
+            socket = sockets.client;
+            readyState = CONNECTING;
+            addListeners(socket, onopen, onmessage, onclose);
+            removeListeners(oldSocket, onopen, onmessage, onclose);
+        }
+    }
+
+    // Setting up
+    dop.core.setSocketToNode(node, socket);
+    readyState = CLOSE;
+    node.reconnect = reconnect;
+    node.on(dop.cons.CONNECT, onconnect);
+    node.on(dop.cons.SEND, send);
+    node.on(dop.cons.DISCONNECT, ondisconnect);
+    addListeners(socket, onopen, onmessage, onclose);
+    
+
+
+
+    return socket.client;
 };
+
+function addListeners(socket, onopen, onmessage, onclose) {
+    socket.on('open', onopen);
+    socket.on('message', onmessage);
+    socket.on('close', onclose);
+}
+function removeListeners(socket, onopen, onmessage, onclose) {
+    socket.removeListener('open', onopen);
+    socket.removeListener('message', onmessage);
+    socket.removeListener('close', onclose);
+}
+
+
+// This function creates two sockets with the same api as a normal websocket
+function api(dop, server) {
+    var socket = {
+        server:new dop.util.emitter(), 
+        client:new dop.util.emitter()
+    };
+    socket.server.readyState = socket.client.readyState = CLOSE;
+    socket.server.send = function(message) {
+        setTimeout(function(){
+            socket.client.emit('message', message);
+        },50)
+    };
+    socket.client.send = function(message) {
+        setTimeout(function(){
+            socket.server.emit('message', message);
+        },50)
+    };
+    socket.server.close = 
+    socket.client.close = function(message) {
+        socket.server.readyState = socket.client.readyState = CLOSE;
+        socket.client.emit('close', message);
+        socket.server.emit('close', message);
+    };
+    // Simulating connection with a delay of 10ms
+    setTimeout(function(){
+        socket.server.readyState = socket.client.readyState = OPEN;
+        server.emit('connection', socket.server);
+        socket.client.emit('open');
+    }, 20);
+    return socket;
+}
+
+
 
 if (typeof dop=='undefined' && typeof module == 'object' && module.exports)
     module.exports = local;
@@ -38,5 +145,11 @@ else {
     :
         root.dopTransportsListenlocal = local;
 }
+
+// Cons
+var CLOSE = 0,
+    OPEN = 1,
+    CONNECTING = 2,
+    CONNECT = 3;
 
 })(this);

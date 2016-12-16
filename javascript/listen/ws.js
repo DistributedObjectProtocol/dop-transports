@@ -22,7 +22,7 @@ function ws(dop, listener, options) {
     transport.on('connection', function(socket) {
 
         function send(message) {
-            (socket.readyState===socket.constructor.OPEN) ?
+            (socket.readyState===OPEN) ?
                 socket.send(message)
             :
                 client.queue.push(message); 

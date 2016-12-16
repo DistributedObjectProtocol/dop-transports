@@ -3,7 +3,7 @@
 ### Listen via:
 | Protocol  | name | port default |
 | ----------- |:-------:| -------:|
-| WebSockets ✅ | [ws](https://github.com/websockets/ws) | 4444  |
+| WebSockets ✓ | [ws](https://github.com/websockets/ws) | 4444  |
 | WebSockets    | [uws](https://github.com/uWebSockets/uWebSockets)  | 4444  |
 | [socket.io](https://github.com/socketio/socket.io)    | socketio  | 4445  |
 | [SockJS](https://github.com/sockjs/sockjs-node)    | sockjs  | 4446  |
@@ -12,7 +12,7 @@
 ### Connect via:
 | Protocol  | name | url default |
 | ----------- |:-------:| -------:|
-| WebSockets ✅ | [ws](https://github.com/websockets/ws) | `http://localhost:4444`  |
+| WebSockets ✓ | [ws](https://github.com/websockets/ws) | `http://localhost:4444`  |
 | [socket.io](https://github.com/socketio/socket.io)    | socketio  | `http://localhost:4445`  |
 | [SockJS](https://github.com/sockjs/sockjs-node)    | sockjs  | `http://localhost:4446`  |
 
@@ -21,13 +21,13 @@
 ### Connect via:
 | Protocol  | name | url default |
 | ----------- |:-------:| -------:|
-| WebSockets ✅ | websocket | `http://localhost:4444`  |
+| WebSockets ✓ | websocket | `http://localhost:4444`  |
 | [socket.io](https://github.com/socketio/socket.io)    | socketio  | `http://localhost:4445`  |
 | [SockJS](https://github.com/sockjs/sockjs-node)    | sockjs  | `http://localhost:4446`  |
 
 
 
-✅ Means is default if not transport is passed as option
+✓ Means is default if not transport is passed as option
 
 
 
