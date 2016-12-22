@@ -142,9 +142,9 @@ if (typeof dop=='undefined' && typeof module == 'object' && module.exports)
     module.exports = local;
 else {
     (typeof dop != 'undefined') ?
-        dop.transports.listen.local = local
+        dop.transports.connect.local = local
     :
-        root.dopTransportsListenlocal = local;
+        root.dopTransportsConnectlocal = local;
 }
 
 // Cons
