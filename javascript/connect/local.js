@@ -3,13 +3,14 @@ function local(dop, node, options) {
     var server = options.listener.listener,
         sockets = api(dop, server),
         socket = sockets.client,
+        tokenServer,
         send_queue = [],
         readyState;
 
 
     // Helpers
     function send(message) {
-        (socket.readyState===OPEN && readyState===CONNECT) ?
+        (socket.readyState===OPEN) ?
             socket.send(message)
         :
             send_queue.push(message); 
@@ -24,7 +25,7 @@ function local(dop, node, options) {
     function onopen() {
         // Reconnect
         if (readyState === CONNECTING)
-            socket.send(node.tokenServer);
+            socket.send(tokenServer);
         // Connect
         else {
             socket.send(''); // Empty means we want to get connected
@@ -35,11 +36,19 @@ function local(dop, node, options) {
     function onmessage(message) {
         // console.log( 'C<<: `'+message.data+'`' );
         // Reconnecting
-        if (readyState===CONNECTING && message===node.tokenServer) {
+        if (readyState===CONNECTING && message===tokenServer) {
             readyState = CONNECT;
             dop.core.setSocketToNode(node, socket);
             dop.core.emitReconnect(node, oldSocket);
             sendQueue();
+        }
+        else if (readyState !== CONNECT) {
+            tokenServer = message;
+            readyState = CONNECT;
+            dop.core.setSocketToNode(node, socket);
+            send(tokenServer);
+            sendQueue();
+            dop.core.emitConnect(node);
         }
         else
             dop.core.emitMessage(node, message);
@@ -50,15 +59,15 @@ function local(dop, node, options) {
     }
 
     // dop events
-    function onconnect() {
-        if (readyState === CONNECTING) {
-            dop.core.emitDisconnect(node);
-            dop.core.setSocketToNode(node, socket);
-        }
-        readyState = CONNECT;
-        dop.core.emitConnect(node);
-        sendQueue();
-    }
+    // function onconnect() {
+    //     if (readyState === CONNECTING) {
+    //         dop.core.emitDisconnect(node);
+    //         dop.core.setSocketToNode(node, socket);
+    //     }
+    //     readyState = CONNECT;
+    //     dop.core.emitConnect(node);
+    //     sendQueue();
+    // }
     function ondisconnect() {
         readyState = CLOSE;
         socket.close();
@@ -79,7 +88,7 @@ function local(dop, node, options) {
     dop.core.setSocketToNode(node, socket);
     readyState = CLOSE;
     node.reconnect = reconnect;
-    node.on(dop.cons.CONNECT, onconnect);
+    // node.on(dop.cons.CONNECT, onconnect);
     node.on(dop.cons.SEND, send);
     node.on(dop.cons.DISCONNECT, ondisconnect);
     addListeners(socket, onopen, onmessage, onclose);
@@ -110,13 +119,13 @@ function api(dop, server) {
     };
     socket.server.readyState = socket.client.readyState = CLOSE;
     socket.server.send = function(message) {
-        // console.log( 'S',message );
+        // console.log( 'S->', '`'+message+'`' );
         setTimeout(function(){
             socket.client.emit('message', message);
         },50)
     };
     socket.client.send = function(message) {
-        // console.log( 'C',message );
+        // console.log( 'C->', '`'+message+'`' );
         setTimeout(function(){
             socket.server.emit('message', message);
         },50)

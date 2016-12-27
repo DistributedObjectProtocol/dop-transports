@@ -23,12 +23,13 @@ function local(dop, listener, options) {
             // console.log( 'S<<: `'+message+'`' );
             var oldClient = clients[message];
             // Emitting message
-            if (client.readyState === CONNECT || client.readyState === CONNECTING)
+            if (client.readyState === CONNECT)
                 dop.core.emitMessage(node, message);
 
             // Checking if client is trying to reconnect
             else if (oldClient!=undefined && oldClient.readyState===CONNECTING && client.readyState===OPEN) {
-                node.removeListener(dop.cons.CONNECT, onconnect);
+                // node.removeListener(dop.cons.CONNECT, onconnect);
+                client.readyState = CONNECT;
                 node.removeListener(dop.cons.SEND, send);
                 node.removeListener(dop.cons.DISCONNECT, ondisconnect);
                 send(message); // Sending same token/message to confirm the reconnection
@@ -39,10 +40,17 @@ function local(dop, listener, options) {
                 client = oldClient;
             }
 
+            // If
+            else if (client.readyState === CONNECTING && message === node.token) {
+                client.readyState = CONNECT;
+                dop.core.emitConnect(node);
+            }
+
             // We send instruction to connect with client
             else if (client.readyState === OPEN) {
                 client.readyState = CONNECTING;
-                dop.core.sendConnect(node);
+                send(node.token);
+                // dop.core.sendConnect(node);
             }
         }
         function onclose() {
@@ -65,10 +73,10 @@ function local(dop, listener, options) {
         }
 
         // dop events
-        function onconnect() {
-            client.readyState = CONNECT;
-            dop.core.emitConnect(node);
-        }
+        // function onconnect() {
+        //     client.readyState = CONNECT;
+        //     dop.core.emitConnect(node);
+        // }
         function ondisconnect() {
             client.readyState = CLOSE;
             socket.close();
@@ -76,7 +84,7 @@ function local(dop, listener, options) {
 
         function ontimeout() {
             delete clients[node.token];
-            node.removeListener(dop.cons.CONNECT, onconnect);
+            // node.removeListener(dop.cons.CONNECT, onconnect);
             node.removeListener(dop.cons.SEND, send);
             node.removeListener(dop.cons.DISCONNECT, ondisconnect);
             dop.core.emitDisconnect(node);
@@ -104,7 +112,7 @@ function local(dop, listener, options) {
 
         clients[node.token] = client;
         dop.core.setSocketToNode(node, socket);
-        node.on(dop.cons.CONNECT, onconnect);
+        // node.on(dop.cons.CONNECT, onconnect);
         node.on(dop.cons.SEND, send);
         node.on(dop.cons.DISCONNECT, ondisconnect);
         socket.on('message', onmessage);
