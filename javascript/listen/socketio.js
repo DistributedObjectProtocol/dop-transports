@@ -1,17 +1,19 @@
 // https://github.com/socketio/socket.io
 function socketio(dop, listener, options) {
 
+    var port = options.port;
+    delete options.port;
+
     if (options.server !== undefined && options.httpServer === undefined)
         options.httpServer = options.server;
 
     var api = options.transport.getApi(),
         transport = new api(options.httpServer, options),
+        closed = false,
         clients = {};
 
-    if (typeof options.httpServer == 'undefined')
-        transport.listen((typeof options.port != 'number') ? 4445 : options.port);
-
-
+    if (options.httpServer === undefined)
+        transport.listen((typeof port != 'number') ? 4445 : port);
 
 
     transport
@@ -37,12 +39,13 @@ function socketio(dop, listener, options) {
             // console.log( 'S<<: `'+message+'`' );
             var oldClient = clients[message];
             // Emitting message
-            if (client.readyState === CONNECT || client.readyState === CONNECTING)
+            if (client.readyState === CONNECT)
                 dop.core.emitMessage(node, message);
 
             // Checking if client is trying to reconnect
             else if (oldClient!=undefined && oldClient.readyState===CONNECTING && client.readyState===OPEN) {
-                node.removeListener(dop.cons.CONNECT, onconnect);
+                // node.removeListener(dop.cons.CONNECT, onconnect);
+                client.readyState = CONNECT;
                 node.removeListener(dop.cons.SEND, send);
                 node.removeListener(dop.cons.DISCONNECT, ondisconnect);
                 send(message); // Sending same token/message to confirm the reconnection
@@ -53,19 +56,26 @@ function socketio(dop, listener, options) {
                 client = oldClient;
             }
 
+            // If
+            else if (client.readyState === CONNECTING && message === node.token) {
+                client.readyState = CONNECT;
+                dop.core.emitConnect(node);
+            }
+
             // We send instruction to connect with client
             else if (client.readyState === OPEN) {
                 client.readyState = CONNECTING;
-                dop.core.sendConnect(node);
+                send(node.token);
+                // dop.core.sendConnect(node);
             }
         }
         function onclose() {
             dop.core.emitClose(node, socket);
             // If node.readyState === CLOSE means node.disconnect() has been called and we DON'T try to reconnect
-            if (client.readyState === CLOSE)
+            if (client.readyState === CLOSE || closed === true)
                 dop.core.emitDisconnect(node);
             // We setup node as reconnecting
-            else if (client.readyState === CONNECT) {
+            else if (client.readyState === CONNECT && closed === false) {
                 client.timeoutReconnection = setTimeout(
                     ontimeout,
                     options.timeout*1000
@@ -79,10 +89,10 @@ function socketio(dop, listener, options) {
         }
 
         // dop events
-        function onconnect() {
-            client.readyState = CONNECT;
-            dop.core.emitConnect(node);
-        }
+        // function onconnect() {
+        //     client.readyState = CONNECT;
+        //     dop.core.emitConnect(node);
+        // }
         function ondisconnect() {
             client.readyState = CLOSE;
             socket.close();
@@ -90,7 +100,7 @@ function socketio(dop, listener, options) {
 
         function ontimeout() {
             delete clients[node.token];
-            node.removeListener(dop.cons.CONNECT, onconnect);
+            // node.removeListener(dop.cons.CONNECT, onconnect);
             node.removeListener(dop.cons.SEND, send);
             node.removeListener(dop.cons.DISCONNECT, ondisconnect);
             dop.core.emitDisconnect(node);
@@ -118,14 +128,20 @@ function socketio(dop, listener, options) {
 
         clients[node.token] = client;
         dop.core.setSocketToNode(node, socket);
-        node.on(dop.cons.CONNECT, onconnect);
+        // node.on(dop.cons.CONNECT, onconnect);
         node.on(dop.cons.SEND, send);
         node.on(dop.cons.DISCONNECT, ondisconnect);
         socket.on('message', onmessage);
         socket.on('disconnect', onclose);
-
-
     });
+
+    var close = transport.close;
+    transport.close = function() {
+        closed = true;
+        for (var token in clients)
+            clearTimeout(clients[token].timeoutReconnection);
+        close.call(transport);
+    };
 
     return transport;
 };

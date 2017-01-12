@@ -1,6 +1,7 @@
 (function(root){
 function local(dop, listener, options) {
     var transport = new dop.util.emitter(),
+        closed = false,
         clients = {};
 
     // Listening for sockets connections
@@ -56,10 +57,10 @@ function local(dop, listener, options) {
         function onclose() {
             dop.core.emitClose(node, socket);
             // If node.readyState === CLOSE means node.disconnect() has been called and we DON'T try to reconnect
-            if (client.readyState === CLOSE)
+            if (client.readyState === CLOSE || closed === true)
                 dop.core.emitDisconnect(node);
             // We setup node as reconnecting
-            else if (client.readyState === CONNECT) {
+            else if (client.readyState === CONNECT && closed === false) {
                 client.timeoutReconnection = setTimeout(
                     ontimeout,
                     options.timeout*1000
@@ -117,7 +118,11 @@ function local(dop, listener, options) {
         node.on(dop.cons.DISCONNECT, ondisconnect);
         socket.on('message', onmessage);
         socket.on('close', onclose);
-    })
+    });
+
+    transport.close = function(){
+        closed = true;
+    };
 
     return transport;
 };

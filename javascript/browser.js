@@ -5,5 +5,8 @@ module.exports = {
         socketio: require('./connect/socketio'),
         sockjs: require('./connect/sockjs'),
         local: require('./connect/local')
+    },
+    listen: {
+        local: require('./listen/local')
     }
 };
