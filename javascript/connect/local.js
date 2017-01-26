@@ -147,7 +147,7 @@ function api(dop, server) {
 
 
 
-if (typeof dop=='undefined' && typeof module == 'object' && module.exports)
+if (typeof module == 'object' && module.exports)
     module.exports = local;
 else {
     (typeof dop != 'undefined') ?
