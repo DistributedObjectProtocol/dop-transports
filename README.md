@@ -1,4 +1,4 @@
-# Dop transports for JavaScript
+# JavaScript transports for dop
 
 [https://distributedobjectprotocol.org/transports](https://distributedobjectprotocol.org/transports)
 
