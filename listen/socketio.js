@@ -15,6 +15,8 @@ function socketio(dop, listener, options) {
     if (options.httpServer === undefined)
         transport.listen((typeof port != 'number') ? 4445 : port);
 
+    if (typeof options.timeout != 'number') // Default timeout we use to disconnect node/client definitely
+        options.timeout = 60; // seconds
 
     transport
     .of((typeof options.namespace != 'string') ? dop.name : options.namespace)
@@ -78,7 +80,7 @@ function socketio(dop, listener, options) {
             else if (client.readyState === CONNECT && closed === false) {
                 client.timeoutReconnection = setTimeout(
                     ontimeout,
-                    options.timeout*1000
+                    \out*1000
                 );
                 client.readyState = CONNECTING;
             }
