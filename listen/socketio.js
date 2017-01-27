@@ -80,7 +80,7 @@ function socketio(dop, listener, options) {
             else if (client.readyState === CONNECT && closed === false) {
                 client.timeoutReconnection = setTimeout(
                     ontimeout,
-                    \out*1000
+                    options.timeout*1000
                 );
                 client.readyState = CONNECTING;
             }
