@@ -56,6 +56,7 @@ function local(dop, node, options) {
     function onclose() {
         readyState = CLOSE;
         dop.core.emitClose(node, socket);
+        dop.core.emitDisconnect(node);
     }
 
     // dop events
