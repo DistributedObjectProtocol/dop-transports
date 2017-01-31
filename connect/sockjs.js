@@ -2,7 +2,8 @@
 (function(root){
 function sockjs(dop, node, options) {
 
-    var url = 'http://localhost:4446/'+dop.name;
+    var url = 'http://localhost:4446/'+dop.name,
+        oldSocket;
 
     if (typeof options.url == 'string')
         url = options.url.replace('ws','http');

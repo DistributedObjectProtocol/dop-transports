@@ -2,7 +2,8 @@
 (function(root){
 function socketio(dop, node, options) {
 
-    var url = 'ws://localhost:4445/'+dop.name;
+    var url = 'ws://localhost:4445/'+dop.name,
+        oldSocket;
 
     if (typeof options.url == 'string')
         url = options.url;

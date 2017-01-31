@@ -5,7 +5,8 @@ function local(dop, node, options) {
         socket = sockets.client,
         tokenServer,
         send_queue = [],
-        readyState;
+        readyState,
+        oldSocket;
 
 
     // Helpers
