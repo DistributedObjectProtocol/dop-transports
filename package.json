@@ -1,6 +1,6 @@
 {
   "name": "dop-transports",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Transports in JavaScript for dop (Distributed Object Protocol)",
   "main": "nodejs.js",
   "browser": "browser.js",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "ws": "^1.1.1",
-    "uws": "^0.11.0",
+    "uws": "^0.14.5",
     "socket.io": "^1.6.0",
     "sockjs": "^0.3.18",
     "sockjs-client": "^1.1.1"
