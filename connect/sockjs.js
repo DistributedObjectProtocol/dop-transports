@@ -7,7 +7,7 @@ function sockjs(dop, node, options) {
 
     if (typeof options.url == 'string')
         url = options.url.replace('ws','http');
-    else if (typeof window!='undefined' && /http/.test(window.location.href)) {
+    else if (typeof window!='undefined' && typeof window.location!='undefined' && /http/.test(window.location.href)) {
         var domain_prefix = /(ss|ps)?:\/\/([^\/]+)\/?(.+)?/.exec(window.location.href),
             protocol = domain_prefix[1] ? 'https' : 'http';
         url = protocol+'://'+domain_prefix[2].toLocaleLowerCase()+'/'+dop.name;
