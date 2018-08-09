@@ -1,32 +1,32 @@
 {
-  "name": "dop-transports",
-  "version": "2.0.8",
-  "description": "Transports in JavaScript for dop (Distributed Object Protocol)",
-  "main": "nodejs.js",
-  "browser": "browser.js",
-  "url": "http://www.distributedobjectprotocol.org",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/DistributedObjectProtocol/transports.git"
-  },
-  "dependencies": {
-    "ws": "^1.1.1",
-    "uws": "^0.14.5",
-    "socket.io": "^1.6.0",
-    "sockjs": "^0.3.18",
-    "sockjs-client": "^1.1.1"
-  },
-  "keywords": [
-    "Distributed Object Protocol",
-    "dop",
-    "transports",
-    "WebSockets",
-    "socket.io",
-    "SockJS"
-  ],
-  "author": "Josema Gonzalez",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/DistributedObjectProtocol/transports/issues"
-  }
+    "name": "dop-transports",
+    "version": "2.0.9",
+    "description": "Transports in JavaScript for dop (Distributed Object Protocol)",
+    "main": "nodejs.js",
+    "browser": "browser.js",
+    "url": "http://www.distributedobjectprotocol.org",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/DistributedObjectProtocol/transports.git"
+    },
+    "dependencies": {
+        "ws": "^1.1.1",
+        "uws": "^0.14.5",
+        "socket.io": "^1.6.0",
+        "sockjs": "^0.3.18",
+        "sockjs-client": "^1.1.1"
+    },
+    "keywords": [
+        "Distributed Object Protocol",
+        "dop",
+        "transports",
+        "WebSockets",
+        "socket.io",
+        "SockJS"
+    ],
+    "author": "Josema Gonzalez",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/DistributedObjectProtocol/transports/issues"
+    }
 }
