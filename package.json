@@ -1,6 +1,6 @@
 {
     "name": "dop-transports",
-    "version": "2.0.9",
+    "version": "2.0.10",
     "description": "Transports in JavaScript for dop (Distributed Object Protocol)",
     "main": "nodejs.js",
     "browser": "browser.js",
