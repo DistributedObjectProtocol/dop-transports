@@ -1,4 +1,3 @@
-
 module.exports = {
     connect: {
         websocket: require('./connect/websocket'),
@@ -9,4 +8,4 @@ module.exports = {
     listen: {
         local: require('./listen/local')
     }
-};
+}
