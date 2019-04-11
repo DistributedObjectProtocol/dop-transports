@@ -2,13 +2,6 @@
 
 [https://distributedobjectprotocol.org/transports](https://distributedobjectprotocol.org/transports)
 
-
-
-
-
-
-
-
 <!--
 
 # node.js can
@@ -16,7 +9,6 @@
 | Protocol  | name | port default |
 | ----------- |:-------:| -------:|
 | WebSockets ✓ | [ws](https://github.com/websockets/ws) | 4444  |
-| WebSockets    | [uws](https://github.com/uWebSockets/uWebSockets)  | 4444  |
 | [socket.io](https://github.com/socketio/socket.io)    | socketio  | 4445  |
 | [SockJS](https://github.com/sockjs/sockjs-node)    | sockjs  | 4446  |
 
@@ -92,5 +84,3 @@
 | [socket.io](https://github.com/socketio)       | ✅ | ✅ |
 | [SockJS](https://github.com/sockjs)          | ✅ | ✅ |
 -->
-
-
