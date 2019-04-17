@@ -1,15 +1,9 @@
 module.exports = {
     connect: {
         websocket: require('./connect/websocket'),
-        ws: require('./connect/ws'),
-        socketio: require('./connect/socketio'),
-        sockjs: require('./connect/sockjs'),
-        local: require('./connect/local')
+        ws: require('./connect/ws')
     },
     listen: {
-        ws: require('./listen/ws'),
-        socketio: require('./listen/socketio'),
-        sockjs: require('./listen/sockjs'),
-        local: require('./listen/local')
+        ws: require('./listen/ws')
     }
 }

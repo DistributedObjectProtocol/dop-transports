@@ -5,8 +5,6 @@ function ws() {
 }
 
 ws.getApi = function() {
-    var api = require('ws')
-    api.prototype.removeEventListener = api.prototype.removeListener
-    return api
+    return require('ws')
 }
 module.exports = ws

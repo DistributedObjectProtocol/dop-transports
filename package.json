@@ -1,6 +1,6 @@
 {
     "name": "dop-transports",
-    "version": "2.0.14",
+    "version": "3.0.0",
     "description": "Transports in JavaScript for dop (Distributed Object Protocol)",
     "main": "nodejs.js",
     "browser": "browser.js",
@@ -10,10 +10,6 @@
         "url": "git+https://github.com/DistributedObjectProtocol/transports.git"
     },
     "dependencies": {
-        "socket.io": "^2.2.0",
-        "sockjs": "^0.3.18",
-        "sockjs-client": "^1.1.1",
-        "uWebSockets.js": "github:uNetworking/uWebSockets.js#v15.9.0",
         "ws": "^1.1.1"
     },
     "devDependencies": {
