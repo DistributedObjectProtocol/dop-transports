@@ -20,35 +20,39 @@ function websocket(dop, options) {
 
     var transport = dop.createTransport()
     var WebSocket = options.transport.getApi()
-    ;(function reconnect(wsClientOld) {
-        var keepReconnecting = true
-        var wsClient = new WebSocket(url)
-        var send = wsClient.send.bind(wsClient)
-        var close = () => {
-            keepReconnecting = false
-            wsClient.close()
+    ;(function reconnect(ws_client_old) {
+        var keep_reconnecting = true
+        var ws_client = new WebSocket(url)
+        var send = ws_client.send.bind(ws_client)
+        var close = function() {
+            keep_reconnecting = false
+            ws_client.close()
         }
-        wsClient.addEventListener('open', function() {
-            if (wsClientOld === undefined) {
-                transport.onOpen(wsClient, send, close)
+        ws_client.addEventListener('open', function() {
+            if (ws_client_old === undefined) {
+                transport.onOpen(ws_client, send, close)
             } else {
-                transport.onReconnect(wsClientOld, wsClient, send, close)
+                transport.onReconnect(ws_client_old, ws_client, send, close)
             }
         })
-        wsClient.addEventListener('message', function(message) {
-            transport.onMessage(wsClient, message)
+        ws_client.addEventListener('message', function(message) {
+            transport.onMessage(ws_client, message.data)
         })
-        wsClient.addEventListener('close', function() {
-            transport.onClose(wsClient)
-            if (keepReconnecting) reconnect(wsClient)
+        ws_client.addEventListener('close', function() {
+            transport.onClose(ws_client)
+            if (keep_reconnecting) reconnect(ws_client)
         })
-        wsClient.addEventListener('error', function(error) {
-            keepReconnecting = false
-            transport.onError(wsClient, error)
+        ws_client.addEventListener('error', function(error) {
+            keep_reconnecting = false
+            transport.onError(ws_client, error)
         })
     })()
+
+    return transport
 }
 
 websocket.getApi = function() {
     return window.WebSocket
 }
+
+module.exports = websocket
