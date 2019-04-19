@@ -13,7 +13,7 @@
         "ws": "^1.1.1"
     },
     "devDependencies": {
-        "dop": "^0.43.0",
+        "dop": "file:../dop",
         "tape": "^4.10.1"
     },
     "keywords": [
