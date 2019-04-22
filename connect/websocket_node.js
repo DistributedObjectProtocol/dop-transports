@@ -1,10 +1,10 @@
 // https://github.com/websockets/ws
 var connectWebsocket = require('./websocket')
-function ws() {
+function websocket() {
     return connectWebsocket.apply(this, arguments)
 }
 
-ws.getApi = function() {
+websocket.getApi = function() {
     return require('ws')
 }
-module.exports = ws
+module.exports = websocket
