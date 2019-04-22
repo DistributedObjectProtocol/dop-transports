@@ -34,6 +34,9 @@ function ws(dop, options) {
         })
         socket.on('close', function() {
             transport.onClose(socket)
+            setTimeout(function() {
+                transport.onDisconnect(socket)
+            }, options.timeout * 1000)
         })
         socket.on('error', function(error) {
             transport.onError(socket, error)
