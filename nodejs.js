@@ -1,9 +1,8 @@
 module.exports = {
     connect: {
-        websocket: require('./connect/websocket'),
-        ws: require('./connect/ws')
+        websocket: require('./connect/websocket_node')
     },
     listen: {
-        ws: require('./listen/ws')
+        websocket: require('./listen/websocket')
     }
 }

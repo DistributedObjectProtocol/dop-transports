@@ -1,6 +1,6 @@
 {
     "name": "dop-transports",
-    "version": "3.0.0",
+    "version": "3.0.0-rc1",
     "description": "Transports in JavaScript for dop (Distributed Object Protocol)",
     "main": "nodejs.js",
     "browser": "browser.js",
@@ -10,10 +10,10 @@
         "url": "git+https://github.com/DistributedObjectProtocol/transports.git"
     },
     "dependencies": {
-        "ws": "^1.1.1"
+        "ws": "^6.2.1"
     },
     "devDependencies": {
-        "dop": "file:../dop",
+        "tap": "^12.6.2",
         "tape": "^4.10.1"
     },
     "keywords": [
@@ -28,5 +28,8 @@
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/DistributedObjectProtocol/transports/issues"
+    },
+    "scripts": {
+        "test": "tap test/*.js"
     }
 }
