@@ -67,9 +67,9 @@
             typeof factory == 'function' &&
             dop.create === factory
         ) // this is true if we are inside of dop.factory
-    )
+    ) {
         module.exports = websocket
-    else {
+    } else {
         websocket.getApi = function() {
             return window.WebSocket
         }
