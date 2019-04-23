@@ -7,9 +7,6 @@ function ws(dop, options) {
     if (options.httpServer !== undefined && options.server === undefined) {
         options.server = options.httpServer
     }
-    if (typeof options.timeout != 'number') {
-        options.timeout = 2 // seconds
-    }
     if (typeof options.namespace != 'string') {
         options.namespace = '/' + dop.name
     }
@@ -33,7 +30,7 @@ function ws(dop, options) {
             transport.onMessage(socket, message)
         })
         socket.on('close', function() {
-            transport.onClose(socket, options.timeout * 1000)
+            transport.onClose(socket)
         })
         socket.on('error', function(error) {
             transport.onError(socket, error)
