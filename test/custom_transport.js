@@ -3,6 +3,8 @@ var WebSocket = require('ws')
 var dop = require('dop').create()
 var dopServer = dop.create()
 var dopClient = dop.create()
+dopServer.env = 'SERVER'
+dopClient.env = 'CLIENT'
 
 var portOriginal = 8989
 var port = portOriginal
@@ -108,22 +110,22 @@ test('SERVER onConnect', function(t) {
     })
 })
 
-test('CLIENT onReconnect', function(t) {
-    transportClient.on('reconnect', function(node) {
-        t.equal(nodeClient, node)
-        t.notEqual(nodeClient.socket, socketClient)
-        t.equal(Object.keys(transportClient.nodesByToken).length, 1)
-        t.equal(transportClient.nodesBySocket.size, 1)
-        t.end()
-    })
-})
-
 test('SERVER onReconnect', function(t) {
     transportServer.on('reconnect', function(node) {
         t.equal(nodeServer, node)
         t.notEqual(nodeServer.socket, socketServer)
         t.equal(Object.keys(transportServer.nodesByToken).length, 1)
         t.equal(transportServer.nodesBySocket.size, 1)
+        t.end()
+    })
+})
+
+test('CLIENT onReconnect', function(t) {
+    transportClient.on('reconnect', function(node) {
+        t.equal(nodeClient, node)
+        t.notEqual(nodeClient.socket, socketClient)
+        t.equal(Object.keys(transportClient.nodesByToken).length, 1)
+        t.equal(transportClient.nodesBySocket.size, 1)
         t.end()
     })
 })

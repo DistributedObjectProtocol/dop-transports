@@ -1,6 +1,3 @@
-// THIS SCRIPT DOES NOT MAKE SENSE BECAUSE:
-// https://stackoverflow.com/questions/32474023/can-websocket-messages-get-lost-or-not
-
 var test = require('tape')
 var dop = require('dop')
 var dopServer = dop.create()
@@ -38,38 +35,38 @@ test('QUEUE TEST', function(t) {
                 send()
             })
             nodeClient.on('message', function(message) {
+                t.equal(
+                    message,
+                    String(incC),
+                    'CLIENT message `' + message + '`'
+                )
                 incC += 1
-                // t.equal(
-                //     message,
-                //     String(incC++),
-                //     'CLIENT message `' + message + '`'
-                // )
             })
             server.on('message', function(node, message) {
+                t.equal(
+                    message,
+                    String(incS),
+                    'SERVER message `' + message + '`'
+                )
                 incS += 1
-                // t.equal(
-                //     message,
-                //     String(incS),
-                //     'SERVER message `' + message + '`'
-                // )
                 if (incS === maxMsg && incC === maxMsg) {
-                    console.log('CLOSSING!!')
+                    // console.log('CLOSSING!!')
                     t.end()
                     // server.disconnectAll()
-                    // server.socket.close()
+                    server.socket.close()
                     // nodeClient.socket.close()
                     // nodeClient.closeSocket()
                 }
             })
 
             setTimeout(function() {
-                console.log('closing...')
+                // console.log('closing...')
                 nodeClient.socket.close()
             }, 400)
 
-            // setTimeout(function() {
-            //     console.log('closing2...')
-            //     nodeServer.socket.close()
-            // }, 800)
+            setTimeout(function() {
+                // console.log('closing2...')
+                nodeServer.socket.close()
+            }, 800)
         })
 })
