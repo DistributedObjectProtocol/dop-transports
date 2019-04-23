@@ -1,86 +1,152 @@
-# JavaScript transports for dop
+# CONNECTIVITY PROTOCOL PROPOSAL
 
-[https://distributedobjectprotocol.org/transports](https://distributedobjectprotocol.org/transports)
+`SERVER` and `CLIENT` are both nodes instances in the dop world.
 
-<!--
+---
 
-# node.js can
-### Listen via:
-| Protocol  | name | port default |
-| ----------- |:-------:| -------:|
-| WebSockets ✓ | [ws](https://github.com/websockets/ws) | 4444  |
-| [socket.io](https://github.com/socketio/socket.io)    | socketio  | 4445  |
-| [SockJS](https://github.com/sockjs/sockjs-node)    | sockjs  | 4446  |
+1. CONNECTION OPENED VIA WEBSOCKETS
+2. BOTH SENDS THEIR TOKEN
 
+```
+SERVER
+- STATUS: OPEN
+- TOKEN: AAA
+- SOCKET: 1
 
-### Connect via:
-| Protocol  | name | url default |
-| ----------- |:-------:| -------:|
-| WebSockets ✓ | [ws](https://github.com/websockets/ws) | `http://localhost:4444`  |
-| [socket.io](https://github.com/socketio/socket.io)    | socketio  | `http://localhost:4445`  |
-| [SockJS](https://github.com/sockjs/sockjs-node)    | sockjs  | `http://localhost:4446`  |
+CLIENT
+- STATUS: OPEN
+- TOKEN: BBB
+- SOCKET: 1
+```
 
+3. BOTH MERGE THEIR TOKEN INTO THE SAME ONE
+4. STATUS IS NOW CONNECTED
 
-# Browser can
-### Connect via:
-| Protocol  | name | url default |
-| ----------- |:-------:| -------:|
-| WebSockets ✓ | websocket | `http://localhost:4444`  |
-| [socket.io](https://github.com/socketio/socket.io)    | socketio  | `http://localhost:4445`  |
-| [SockJS](https://github.com/sockjs/sockjs-node)    | sockjs  | `http://localhost:4446`  |
+```
+SERVER
+- STATUS: CONNECTED
+- TOKEN: AAABBB
+- SOCKET: 1
 
+CLIENT
+- STATUS: CONNECTED
+- TOKEN: AAABBB
+- SOCKET: 1
+```
 
+5. SOCKET IS CLOSED
+6. BOTH CHANGE THE STATUS TO RECONNECTING
 
-✓ Means is default if not transport is passed as option
+```
+SERVER
+- STATUS: RECONNECTING
+- TOKEN: AAABBB
+- SOCKET: 1
 
+CLIENT
+- STATUS: RECONNECTING
+- TOKEN: AAABBB
+- SOCKET: 1
+```
 
+5. SOCKET IS CLOSED
+6. BOTH CHANGE THE STATUS TO RECONNECTING
 
+```
+SERVER
+- STATUS: RECONNECTING
+- TOKEN: AAABBB
+- SOCKET: 1
 
-# By technology
+CLIENT
+- STATUS: RECONNECTING
+- TOKEN: AAABBB
+- SOCKET: 1
+```
 
-### WebSockets ([ws](https://github.com/websockets/ws))
-|    | Browser | node.js |
-| ----------- |:-------:| -------:|
-| __Browser__     | ❌ | ✅  |
-| __node.js__     | ✅  | ✅  |
+7. CLIENT TRY TO RECCONNECT OPENING A NEW SOCKET
+8. CLIENT CHANGE STATUS TO
+9. CLIENT SENDS THE SAME OLD TOKEN AS RECONNECT INSTRUNCTION
+10. A NEW NODE IS CREATED ON THE SERVER SIDE
 
-### [socket.io](https://github.com/socketio)
-|   | Browser | node.js |
-| ----------- |:-------:| -------:|
-| __Browser__     | ❌ | ✅  |
-| __node.js__     | ✅  | ✅  |
+```
+SERVER1
+- STATUS: RECONNECTING
+- TOKEN: AAABBB
+- SOCKET: 1
+SERVER2
+- STATUS: OPEN
+- TOKEN: CCC
+- SOCKET: 2
 
-### [SockJS](https://github.com/sockjs)
-|   | Browser | node.js |
-| ----------- |:-------:| -------:|
-| __Browser__     | ❌ | ✅  |
-| __node.js__     | ✅  | ✅  |
+CLIENT
+- STATUS: PRECONNECTED
+- TOKEN: AAABBB
+- SOCKET: 2
+```
 
+11. SERVER2 RECEIVE THE OLD TOKEN
+12. SOCKET2 IS ASSIGNED TO SERVER1
+13. SERVER1 IS NOW AS CONNECTED
+14. WE DESTROY SERVER2
+15. SERVER1 SENDS THE TOKEN AS INSTRUNCTION TO RECONNECT
 
+```
+SERVER1
+- STATUS: CONNECTED
+- TOKEN: AAABBB
+- SOCKET: 2
 
+CLIENT
+- STATUS: PRECONNECTED
+- TOKEN: AAABBB
+- SOCKET: 2
+```
 
-# All
+16. CLIENT RECEIVE TOKEN SERVER1
+17. CLIENT CHANGE STATUS TO CONNECTED
 
-|             | Browser | node.js |
-| ----------- |:-------:| -------:|
-| __Browser__     | - | WebSockets, [socket.io](https://github.com/socketio), [SockJS](https://github.com/sockjs)  |
-| __node.js__     | WebSockets, [socket.io](https://github.com/socketio), [SockJS](https://github.com/sockjs)  | WebSockets, [socket.io](https://github.com/socketio), [SockJS](https://github.com/sockjs)  |
+```
+SERVER1
+- STATUS: CONNECTED
+- TOKEN: AAABBB
+- SOCKET: 2
 
+CLIENT
+- STATUS: CONNECTED
+- TOKEN: AAABBB
+- SOCKET: 2
+```
 
+18. SERVER1 RUN DISCONNECT
+19. SERVER1 SENDS TOKEN TO THE CLIENT AS DISCONNECT INSTRUCTION
+20. SERVER1 CHANGE STATUS TO DISCONNECTED
+21. SERVER1 CLOSE SOCKET
 
+```
+SERVER1
+- STATUS: DISCONNECTED
+- TOKEN: AAABBB
+- SOCKET: 2
 
+CLIENT
+- STATUS: CONNECTED
+- TOKEN: AAABBB
+- SOCKET: 2
+```
 
-# By Platform
+22. CLIENT RECEIVE TOKEN
+23. CLIENT CHANGE STATUS TO DISCONNECTED
+24. SOCKET2 IS CLOSED
 
-| Browser | Listen | Connect |
-| ---------- |:--:| --:|
-| WebSockets    | ❌ |✅ |
-| [socket.io](https://github.com/socketio)  | ❌ |✅ |
-| [SockJS](https://github.com/sockjs)     | ❌ |✅ |
+```
+SERVER1
+- STATUS: DISCONNECTED
+- TOKEN: AAABBB
+- SOCKET: 2 (closed)
 
-| node.js | Listen | Connect |
-| --------------- |:--:| --:|
-| WebSockets ([ws](https://github.com/websockets/ws)) | ✅ | ✅ |
-| [socket.io](https://github.com/socketio)       | ✅ | ✅ |
-| [SockJS](https://github.com/sockjs)          | ✅ | ✅ |
--->
+CLIENT
+- STATUS: DISCONNECTED
+- TOKEN: AAABBB
+- SOCKET: 2 (closed)
+```

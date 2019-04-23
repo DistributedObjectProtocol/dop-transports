@@ -17,7 +17,7 @@ test('RECONNECT TEST', function(t) {
         .then(function(nodeClient) {
             dopServer.env = 'SERVER'
             dopClient.env = 'CLIENT'
-            var nodeServer, socketServer, socketClient
+            var nodeServer, socketServer
 
             server.on('connect', function(node) {
                 nodeServer = node
@@ -25,25 +25,21 @@ test('RECONNECT TEST', function(t) {
                 tokenServer = node.token
             })
             server.on('reconnect', function(node) {
+                const nodesByToken = Object.keys(server.nodesByToken).length
                 t.equal(
                     node === nodeServer && node.socket !== socketServer,
                     true,
                     'SERVER reconnect'
                 )
-                t.equal(
-                    Object.keys(server.nodesByToken).length,
-                    1,
-                    'server nodesByToken 1'
-                )
+                t.equal(nodesByToken, 1, 'server nodesByToken 1')
                 t.equal(server.nodesBySocket.size, 1, 'server nodesBySocket 1')
             })
-            nodeClient.on('reconnect', function(oldSocket) {
+            nodeClient.on('reconnect', function() {
+                const nodesByToken = Object.keys(
+                    nodeClient.transport.nodesByToken
+                ).length
                 t.equal(nodeClient.token, nodeServer.token, 'CLIENT reconnect')
-                t.equal(
-                    Object.keys(nodeClient.transport.nodesByToken).length,
-                    1,
-                    'client nodesByToken 1'
-                )
+                t.equal(nodesByToken, 1, 'client nodesByToken 1')
                 t.equal(
                     nodeClient.transport.nodesBySocket.size,
                     1,
