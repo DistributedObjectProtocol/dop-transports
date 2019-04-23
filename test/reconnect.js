@@ -8,7 +8,7 @@ var transportListen = require('../').listen[transportName]
 var transportConnect = require('../').connect[transportName]
 
 test('RECONNECT TEST', function(t) {
-    var server = dopServer.listen({ transport: transportListen, timeout: 1.5 })
+    var server = dopServer.listen({ transport: transportListen })
     dopClient
         .connect({
             transport: transportConnect,
@@ -30,9 +30,25 @@ test('RECONNECT TEST', function(t) {
                     true,
                     'SERVER reconnect'
                 )
+                t.equal(
+                    Object.keys(server.nodesByToken).length,
+                    1,
+                    'server nodesByToken 1'
+                )
+                t.equal(server.nodesBySocket.size, 1, 'server nodesBySocket 1')
             })
             nodeClient.on('reconnect', function(oldSocket) {
                 t.equal(nodeClient.token, nodeServer.token, 'CLIENT reconnect')
+                t.equal(
+                    Object.keys(nodeClient.transport.nodesByToken).length,
+                    1,
+                    'client nodesByToken 1'
+                )
+                t.equal(
+                    nodeClient.transport.nodesBySocket.size,
+                    1,
+                    'client nodesBySocket 1'
+                )
                 t.end()
                 try {
                     server.socket.close()

@@ -8,7 +8,7 @@ function ws(dop, options) {
         options.server = options.httpServer
     }
     if (typeof options.timeout != 'number') {
-        options.timeout = 60 // seconds
+        options.timeout = 2 // seconds
     }
     if (typeof options.namespace != 'string') {
         options.namespace = '/' + dop.name
