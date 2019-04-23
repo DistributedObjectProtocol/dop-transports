@@ -31,6 +31,8 @@
         "url": "https://github.com/DistributedObjectProtocol/transports/issues"
     },
     "scripts": {
-        "test": "tap test/*.js"
+        "test": "tap test/*.js",
+        "test:websocket": "tap test/*.js --test-arg=websocket",
+        "test:local": "tap test/*.js --test-arg=local"
     }
 }

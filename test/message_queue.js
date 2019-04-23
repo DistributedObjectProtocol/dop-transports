@@ -4,7 +4,7 @@ var dopServer = dop.create()
 var dopClient = dop.create()
 dopServer.env = 'SERVER'
 dopClient.env = 'CLIENT'
-var transportName = process.argv[2] || 'websocket'
+var transportName = process.argv[2] || 'local'
 var transportListen = require('../').listen[transportName]
 var transportConnect = require('../').connect[transportName]
 
