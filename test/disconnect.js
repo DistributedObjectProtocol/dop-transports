@@ -9,64 +9,65 @@ const transportName = process.argv[2] || 'local'
 const transportListen = require('../').listen[transportName]
 const transportConnect = require('../').connect[transportName]
 
-test('SERVER DISCONNECT()', async t => {
+test('SERVER DISCONNECT()', function(t) {
     logic(t, true)
 })
 
-test('CLIENT DISCONNECT()', async t => {
+test('CLIENT DISCONNECT()', function(t) {
     logic(t, false)
 })
 
-async function logic(t, isServer) {
-    const server = dopServer.listen({
+function logic(t, isServer) {
+    var server = dopServer.listen({
         transport: transportListen
     })
-    const nodeClient = await dopClient.connect({
-        transport: transportConnect,
-        listener: server
+    var client = dopClient.connect({
+        transport: transportConnect
     })
 
-    let nodeServer
+    var nodeServer
+    var nodeClient
     server.on('connect', function(node) {
+        t.test(nodeServer, undefined)
         nodeServer = node
-        tokenServer = node.token
-        t.equal(true, true, 'SERVER connect')
+    })
+    client.on('connect', function(node) {
+        t.test(nodeClient, undefined)
+        nodeClient = node
         if (isServer) {
             node.disconnect()
         } else {
             nodeClient.disconnect()
         }
     })
+
     server.on('disconnect', function(node) {
         const nodesByToken = Object.keys(server.nodesByToken).length
+        t.equal(nodeServer.status, dop.cons.NODE_STATE_DISCONNECTED)
         t.equal(node, nodeServer, 'SERVER disconnect')
         t.equal(nodesByToken, 0, 'server nodesByToken 0')
         t.equal(server.nodesBySocket.size, 0, 'server nodesBySocket 0')
         if (!isServer) {
-            server.socket.close()
+            server.close()
             t.end()
         }
     })
-    server.on('reconnect', function(node, oldSocket) {
+    server.on('reconnect', function() {
         t.equal(false, true, 'SERVER this should not happen') // this should not happen
     })
 
-    nodeClient.on('disconnect', function() {
-        const nodesByToken = Object.keys(nodeClient.transport.nodesByToken)
-            .length
-        t.equal(nodeClient.token, nodeServer.token, 'CLIENT disconnect')
+    client.on('disconnect', function(node) {
+        const nodesByToken = Object.keys(client.nodesByToken).length
+        t.equal(nodeClient.status, dop.cons.NODE_STATE_DISCONNECTED)
+        t.equal(node, nodeClient, 'CLIENT disconnect')
         t.equal(nodesByToken, 0, 'client nodesByToken 0')
-        t.equal(
-            nodeClient.transport.nodesBySocket.size,
-            0,
-            'client nodesBySocket 0'
-        )
+        t.equal(client.nodesBySocket.size, 0, 'client nodesBySocket 0')
         if (isServer) {
-            server.socket.close()
+            server.close()
             t.end()
         }
     })
-    nodeClient.on('reconnect', function(oldSocket) {
-        t.equal(true, false, 'CLIENT this should not happen') // this should not happen
+    client.on('reconnect', function() {
+        t.equal(false, true, 'CLIENT this should not happen') // this should not happen
     })
 }
