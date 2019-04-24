@@ -68,3 +68,51 @@ CLIENT
 - token_remote: AAAA
 - socket: 1
 ```
+
+# RECONNECTION
+
+9. If the socket is closed CLIENT will try to reconnect opening a new Socket
+10. Server creates another node
+
+```
+SERVER1
+- status: CONNECTED
+- token: AAAABBBB
+- token_local: AAAA
+- token_remote: BBBB
+- socket: 1 (closed)
+SERVER2
+- status: OPEN
+- token_local: CCCC
+- socket: 2 (closed)
+
+CLIENT
+- status: RECONNECTING
+- token: AAAABBBB
+- token_local: BBBB
+- token_remote: AAAA
+- socket: 2
+```
+
+<!--
+## DISCONNECTION
+
+9. If any node sends the `token` as instructions means is a formal disconnection. And can't be recovered.
+10. CLIENT sends `AAAABBBB`
+
+```
+SERVER
+- status: DISCONNECTED
+- token: AAAABBBB
+- token_local: AAAA
+- token_remote: BBBB
+- socket: 1 (closed)
+
+CLIENT
+- status: DISCONNECTED
+- token: AAAABBBB
+- token_local: BBBB
+- token_remote: AAAA
+- socket: 1 (closed)
+```
+-->

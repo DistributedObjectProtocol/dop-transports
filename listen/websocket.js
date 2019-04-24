@@ -16,8 +16,8 @@ function ws(dop, options) {
     var WebSocketServer = options.transport.getApi()
     var ws_server = new WebSocketServer(options)
     var transport = dop.createTransport(
-        ws_server,
-        ws_server.close.bind(ws_server)
+        ws_server, //                       equivalent to: transport.socket = ws_server
+        ws_server.close.bind(ws_server) //  equivalent to: transport.close = ws_server.close.bind(ws_server)
     )
 
     ws_server.on('connection', function(socket) {
