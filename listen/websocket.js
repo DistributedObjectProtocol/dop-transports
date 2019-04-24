@@ -13,11 +13,13 @@ function ws(dop, options) {
 
     options.perMessageDeflate = false // https://github.com/websockets/ws/issues/923
 
-    var transport = dop.createTransport()
     var WebSocketServer = options.transport.getApi()
     var ws_server = new WebSocketServer(options)
+    var transport = dop.createTransport(
+        ws_server,
+        ws_server.close.bind(ws_server)
+    )
 
-    transport.socket = ws_server
     ws_server.on('connection', function(socket) {
         function send(message) {
             if (socket.readyState === 1) {

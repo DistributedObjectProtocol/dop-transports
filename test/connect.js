@@ -18,8 +18,6 @@ test('CONNECT TEST', function(t) {
         listener: server
     })
     var tokenServer
-    var tokenClient
-
     server.on('connect', function(node) {
         tokenServer = node
         t.equal(true, true, 'SERVER connect')
@@ -28,8 +26,8 @@ test('CONNECT TEST', function(t) {
         t.equal(tokenServer.token, node.token, 'CLIENT connect')
         t.equal(tokenServer.token_local, node.token_remote)
         t.equal(tokenServer.token_remote, node.token_local)
-        node.closeSocket()
-        server.socket.close()
+        node.closeSocket() // avoid reconnections
+        server.close() // this must terminate the server
         t.end()
     })
 })
