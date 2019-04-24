@@ -13,21 +13,22 @@ test('CONNECT TEST', function(t) {
     var server = dopServer.listen({
         transport: transportListen
     })
+    var client = dopClient.connect({
+        transport: transportConnect,
+        listener: server
+    })
     var tokenServer
     var tokenClient
 
-    dopClient
-        .connect({
-            transport: transportConnect,
-            listener: server
-        })
-        .then(function(nodeClient) {
-            tokenClient = nodeClient.token
-            // t.equal(tokenServer, nodeClient.token, 'SERVER connect')
-        })
-
     server.on('connect', function(node) {
-        t.equal(tokenClient, node.token, 'SERVER connect')
+        tokenServer = node
+        t.equal(true, true, 'SERVER connect')
+    })
+    client.on('connect', function(node) {
+        t.equal(tokenServer.token, node.token, 'CLIENT connect')
+        t.equal(tokenServer.token_local, node.token_remote)
+        t.equal(tokenServer.token_remote, node.token_local)
+        node.closeSocket()
         server.socket.close()
         t.end()
     })

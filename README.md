@@ -2,221 +2,69 @@
 
 `SERVER` and `CLIENT` are both nodes instances in the dop world.
 
-## CONNECT, RECONNECT AND DISCONNECT FLOW
+## STATUS
+
+```
+OPEN: 0
+PRECONNECTED: 1
+CONNECTED: 2
+RECONNECTING: 3
+DISCONNECTED: 4
+```
 
 ---
 
-1. CONNECTION OPENED VIA WEBSOCKETS
-2. BOTH SENDS THEIR TOKEN
+## CONNECTION
+
+1. Connection opened via WebSockets and this is the state for both nodes:
 
 ```
 SERVER
-- STATUS: OPEN
-- TOKEN: AAAA
-- SOCKET: 1
+- status: OPEN
+- token_local: AAAA
+- socket: 1
 
 CLIENT
-- STATUS: OPEN
-- TOKEN: BBBB
-- SOCKET: 1
+- status: OPEN
+- token_local: BBBB
+- socket: 1
 ```
 
-3. BOTH MERGE THEIR TOKEN INTO THE SAME ONE (The merge must be in alphabetical order)
-4. STATUS IS NOW CONNECTED
+2. Both sends the instruction to start the connection
+3. Client sends `BBBB`
+4. Server sends `AAAA`
 
 ```
 SERVER
-- STATUS: CONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 1
+- status: PRECONNECTED
+- token_local: AAAA
+- token_remote: BBBB
+- socket: 1
 
 CLIENT
-- STATUS: CONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 1
+- status: PRECONNECTED
+- token_local: BBBB
+- token_remote: AAAA
+- socket: 1
 ```
 
-5. SOCKET IS CLOSED
-6. BOTH CHANGE THE STATUS TO RECONNECTING
+5. Both sends the remote token to confirm the connection
+6. Server sends `BBBB`
+7. Client sends `AAAA`
+8. Both nodes merge the local and remote token to create the final token (The merge must be in alphabetical order)
 
 ```
 SERVER
-- STATUS: RECONNECTING
-- TOKEN: AAAABBBB
-- SOCKET: 1 (closed)
+- status: CONNECTED
+- token: AAAABBBB
+- token_local: AAAA
+- token_remote: BBBB
+- socket: 1
 
 CLIENT
-- STATUS: RECONNECTING
-- TOKEN: AAAABBBB
-- SOCKET: 1 (closed)
-```
-
-7. CLIENT TRY TO RECCONNECT OPENING A NEW SOCKET
-8. CLIENT CHANGE STATUS TO
-9. CLIENT SENDS THE SAME OLD TOKEN AS RECONNECT INSTRUNCTION
-10. A NEW NODE IS CREATED ON THE SERVER SIDE
-
-```
-SERVER1
-- STATUS: RECONNECTING
-- TOKEN: AAAABBBB
-- SOCKET: 1 (closed)
-SERVER2
-- STATUS: OPEN
-- TOKEN: CCCC
-- SOCKET: 2
-
-CLIENT
-- STATUS: PRECONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2
-```
-
-11. SERVER2 RECEIVE THE OLD TOKEN
-12. SOCKET2 IS ASSIGNED TO SERVER1
-13. SERVER1 IS NOW AS CONNECTED
-14. WE DESTROY SERVER2
-15. SERVER1 SENDS THE TOKEN AS INSTRUNCTION TO RECONNECT
-
-```
-SERVER1
-- STATUS: CONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2
-
-CLIENT
-- STATUS: PRECONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2
-```
-
-16. CLIENT RECEIVE TOKEN SERVER1
-17. CLIENT CHANGE STATUS TO CONNECTED
-
-```
-SERVER1
-- STATUS: CONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2
-
-CLIENT
-- STATUS: CONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2
-```
-
-18. SERVER1 RUN DISCONNECT
-19. SERVER1 SENDS TOKEN TO THE CLIENT AS DISCONNECT INSTRUCTION
-20. SERVER1 CHANGE STATUS TO DISCONNECTED
-21. SERVER1 CLOSE SOCKET
-
-```
-SERVER1 (deleted)
-- STATUS: DISCONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2
-
-CLIENT
-- STATUS: CONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2
-```
-
-22. CLIENT RECEIVE TOKEN
-23. CLIENT CHANGE STATUS TO DISCONNECTED
-24. SOCKET2 IS CLOSED
-
-```
-SERVER1 (deleted)
-- STATUS: DISCONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2 (closed)
-
-CLIENT (deleted)
-- STATUS: DISCONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2 (closed)
-```
-
-## RECONNECTION FROM CLIENT MUST FAIL IF SERVER FINNALY DISCONNECT
-
-We recover the state from `6` which is the one after SOCKET is closed
-
-```
-SERVER
-- STATUS: RECONNECTING
-- TOKEN: AAAABBBB
-- SOCKET: 1 (closed)
-
-CLIENT
-- STATUS: RECONNECTING
-- TOKEN: AAAABBBB
-- SOCKET: 1 (closed)
-```
-
-7. We set SERVER as DISCONNECTED which means is also deleted from memory
-
-```
-SERVER (deleted)
-- STATUS: DISCONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 1 (closed)
-
-CLIENT
-- STATUS: RECONNECTING
-- TOKEN: AAAABBBB
-- SOCKET: 1 (closed)
-```
-
-8. CLIENT then try to reconnect because don't know is a finnaly disconnection.
-9. CLIENT sends old token to try reconnection.
-
-```
-SERVER2
-- STATUS: OPEN
-- TOKEN: CCCC
-- SOCKET: 2
-
-CLIENT
-- STATUS: PRECONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2
-```
-
-10. SERVER2 cant recover that deleted token. So we reuse the old token to form our new token.
-11. Having this two tokens `CCC` and `AAAABBBB` we use this formula to create the new one:
-
-```js
-token1 = 'CCCC'
-token2 = 'AAAABBBB'
-token2 = token2.substr(token1.length / 2, token1.length) // AABBC
-newToken = `${token2}${token1}` // AABBCCCC
-```
-
-```
-SERVER2
-- STATUS: CONNECTED
-- TOKEN: AABBCCCC
-- SOCKET: 2
-
-CLIENT
-- STATUS: PRECONNECTED
-- TOKEN: AAAABBBB
-- SOCKET: 2
-```
-
-12. Client do not receive the the old token to reconnect.
-13. We must delete the old node and create a new one, traspasing the socket.
-
-```
-SERVER2
-- STATUS: CONNECTED
-- TOKEN: AABBCCCC
-- SOCKET: 2
-
-CLIENT1 (deleted)
-CLIENT2
-- STATUS: CONNECTED
-- TOKEN: AABBCCCC
-- SOCKET: 2
+- status: CONNECTED
+- token: AAAABBBB
+- token_local: BBBB
+- token_remote: AAAA
+- socket: 1
 ```
