@@ -16,16 +16,17 @@ function ws(dop, options) {
     var transport = dop.createTransport()
     var WebSocketServer = options.transport.getApi()
     var ws_server = new WebSocketServer(options)
-    var send = function(message) {
-        if (this.readyState === 1) {
-            this.send(message)
-            return true
-        }
-        return false
-    }
+
     transport.socket = ws_server
     ws_server.on('connection', function(socket) {
-        transport.onOpen(socket, send.bind(socket), socket.close.bind(socket))
+        function send(message) {
+            if (socket.readyState === 1) {
+                socket.send(message)
+                return true
+            }
+            return false
+        }
+        transport.onOpen(socket, send, socket.close.bind(socket))
         socket.on('message', function(message) {
             transport.onMessage(socket, message)
         })

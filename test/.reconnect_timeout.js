@@ -9,13 +9,13 @@ const transportName = process.argv[2] || 'local'
 const transportListen = require('../').listen[transportName]
 const transportConnect = require('../').connect[transportName]
 
-test('RECONNECTFAIL TEST', async t => {
+test('RECONNECTFAIL TIMEOUT', async t => {
     const server = dopServer.listen({
         transport: transportListen
     })
     const nodeClient = await dopClient.connect({
         transport: transportConnect,
-        timeoutReconnect: 10,
+        timeoutReconnect: 1,
         listener: server
     })
 
@@ -46,6 +46,8 @@ test('RECONNECTFAIL TEST', async t => {
             0,
             'client nodesBySocket 0'
         )
+        t.end()
+        server.socket.close()
     })
     nodeClient.on('reconnect', function(oldSocket) {
         t.equal(true, false, 'CLIENT this should not happen') // this should not happen
@@ -57,5 +59,5 @@ test('RECONNECTFAIL TEST', async t => {
     }, 250)
     setTimeout(function() {
         nodeServer.disconnect()
-    }, 5000)
+    }, 500)
 })

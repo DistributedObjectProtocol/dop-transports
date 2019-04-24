@@ -12,27 +12,27 @@
 ```
 SERVER
 - STATUS: OPEN
-- TOKEN: AAA
+- TOKEN: AAAA
 - SOCKET: 1
 
 CLIENT
 - STATUS: OPEN
-- TOKEN: BBB
+- TOKEN: BBBB
 - SOCKET: 1
 ```
 
-3. BOTH MERGE THEIR TOKEN INTO THE SAME ONE
+3. BOTH MERGE THEIR TOKEN INTO THE SAME ONE (The merge must be in alphabetical order)
 4. STATUS IS NOW CONNECTED
 
 ```
 SERVER
 - STATUS: CONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 1
 
 CLIENT
 - STATUS: CONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 1
 ```
 
@@ -42,12 +42,12 @@ CLIENT
 ```
 SERVER
 - STATUS: RECONNECTING
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 1 (closed)
 
 CLIENT
 - STATUS: RECONNECTING
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 1 (closed)
 ```
 
@@ -59,16 +59,16 @@ CLIENT
 ```
 SERVER1
 - STATUS: RECONNECTING
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 1 (closed)
 SERVER2
 - STATUS: OPEN
-- TOKEN: CCC
+- TOKEN: CCCC
 - SOCKET: 2
 
 CLIENT
 - STATUS: PRECONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 2
 ```
 
@@ -81,12 +81,12 @@ CLIENT
 ```
 SERVER1
 - STATUS: CONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 2
 
 CLIENT
 - STATUS: PRECONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 2
 ```
 
@@ -96,12 +96,12 @@ CLIENT
 ```
 SERVER1
 - STATUS: CONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 2
 
 CLIENT
 - STATUS: CONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 2
 ```
 
@@ -113,12 +113,12 @@ CLIENT
 ```
 SERVER1 (deleted)
 - STATUS: DISCONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 2
 
 CLIENT
 - STATUS: CONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 2
 ```
 
@@ -129,12 +129,12 @@ CLIENT
 ```
 SERVER1 (deleted)
 - STATUS: DISCONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 2 (closed)
 
 CLIENT (deleted)
 - STATUS: DISCONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 2 (closed)
 ```
 
@@ -145,12 +145,12 @@ We recover the state from `6` which is the one after SOCKET is closed
 ```
 SERVER
 - STATUS: RECONNECTING
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 1 (closed)
 
 CLIENT
 - STATUS: RECONNECTING
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 1 (closed)
 ```
 
@@ -159,27 +159,64 @@ CLIENT
 ```
 SERVER (deleted)
 - STATUS: DISCONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 1 (closed)
 
 CLIENT
 - STATUS: RECONNECTING
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
 - SOCKET: 1 (closed)
 ```
 
 8. CLIENT then try to reconnect because don't know is a finnaly disconnection.
-9. CLIENT sends token to try reconnection.
-10. SERVER2 cant recover that deleted token.
+9. CLIENT sends old token to try reconnection.
 
 ```
 SERVER2
 - STATUS: OPEN
-- TOKEN: CCC
+- TOKEN: CCCC
 - SOCKET: 2
 
 CLIENT
 - STATUS: PRECONNECTED
-- TOKEN: AAABBB
+- TOKEN: AAAABBBB
+- SOCKET: 2
+```
+
+10. SERVER2 cant recover that deleted token. So we reuse the old token to form our new token.
+11. Having this two tokens `CCC` and `AAAABBBB` we use this formula to create the new one:
+
+```js
+token1 = 'CCCC'
+token2 = 'AAAABBBB'
+token2 = token2.substr(token1.length / 2, token1.length) // AABBC
+newToken = `${token2}${token1}` // AABBCCCC
+```
+
+```
+SERVER2
+- STATUS: CONNECTED
+- TOKEN: AABBCCCC
+- SOCKET: 2
+
+CLIENT
+- STATUS: PRECONNECTED
+- TOKEN: AAAABBBB
+- SOCKET: 2
+```
+
+12. Client do not receive the the old token to reconnect.
+13. We must delete the old node and create a new one, traspasing the socket.
+
+```
+SERVER2
+- STATUS: CONNECTED
+- TOKEN: AABBCCCC
+- SOCKET: 2
+
+CLIENT1 (deleted)
+CLIENT2
+- STATUS: CONNECTED
+- TOKEN: AABBCCCC
 - SOCKET: 2
 ```
