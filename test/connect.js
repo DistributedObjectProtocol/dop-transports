@@ -23,8 +23,6 @@ test('CONNECT TEST', function(t) {
     })
     client.on('connect', function(node) {
         t.equal(nodeServer.token, node.token, 'CLIENT connect')
-        t.equal(nodeServer.token_local, node.token_remote)
-        t.equal(nodeServer.token_remote, node.token_local)
         t.equal(nodeServer.status, dop.cons.NODE_STATE_CONNECTED)
         t.equal(node.status, dop.cons.NODE_STATE_CONNECTED)
         node.closeSocket() // avoid reconnections
