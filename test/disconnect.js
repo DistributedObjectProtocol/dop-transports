@@ -1,9 +1,5 @@
 const test = require('tape')
 const dop = require('dop').create()
-const dopServer = dop.create()
-const dopClient = dop.create()
-dopServer.env = 'SERVER'
-dopClient.env = 'CLIENT'
 
 const transportName = process.argv[2] || 'local'
 const transportListen = require('../').listen[transportName]
@@ -18,6 +14,11 @@ test('CLIENT DISCONNECT()', function(t) {
 })
 
 function logic(t, isServer) {
+    const dopServer = dop.create()
+    const dopClient = dop.create()
+    dopServer.env = 'SERVER'
+    dopClient.env = 'CLIENT'
+
     var server = dopServer.listen({
         transport: transportListen
     })

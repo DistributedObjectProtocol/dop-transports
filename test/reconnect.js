@@ -1,5 +1,5 @@
 var test = require('tape')
-var dop = require('dop').create()
+var dop = require('../dop')
 var dopServer = dop.create()
 var dopClient = dop.create()
 dopServer.env = 'SERVER'
@@ -45,6 +45,7 @@ test('RECONNECT TEST', function(t) {
         )
         t.equal(nodesByToken, 1, 'server nodesByToken 1')
         t.equal(server.nodesBySocket.size, 1, 'server nodesBySocket 1')
+        t.equal(node.token, nodeServer.token, 'same token')
     })
     client.on('reconnect', function(node) {
         const nodesByToken = Object.keys(client.nodesByToken).length
@@ -55,6 +56,7 @@ test('RECONNECT TEST', function(t) {
         )
         t.equal(nodesByToken, 1, 'client nodesByToken 1')
         t.equal(client.nodesBySocket.size, 1, 'client nodesBySocket 1')
+        t.equal(node.token, nodeClient.token, 'same token')
         t.end()
         node.closeSocket() // avoid reconnections
         server.close() // this must terminate the server

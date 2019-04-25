@@ -48,9 +48,9 @@ CLIENT
 - socket: 1
 ```
 
-5. Both sends the remote token to confirm the connection
-6. Server sends `BBBB`
-7. Client sends `AAAA`
+5. Both sends the local token again to confirm the connection
+6. Server sends `AAAA`
+7. Client sends `BBBB`
 8. Both nodes merge the local and remote token to create the final token (The merge must be in alphabetical order)
 
 ```
@@ -76,7 +76,7 @@ CLIENT
 
 ```
 SERVER1
-- status: CONNECTED
+- status: RECONNECTING
 - token: AAAABBBB
 - token_local: AAAA
 - token_remote: BBBB
@@ -84,13 +84,76 @@ SERVER1
 SERVER2
 - status: OPEN
 - token_local: CCCC
-- socket: 2 (closed)
+- socket: 2
 
 CLIENT
 - status: RECONNECTING
 - token: AAAABBBB
 - token_local: BBBB
 - token_remote: AAAA
+- socket: 2
+```
+
+11. SERVER2 sends `CCCC`
+12. CLIENT is PRECONNECTED
+
+```
+SERVER1
+- status: RECONNECTING
+- token: AAAABBBB
+- token_local: AAAA
+- token_remote: BBBB
+- socket: 1 (closed)
+SERVER2
+- status: OPEN
+- token_local: CCCC
+- socket: 2
+
+CLIENT
+- status: PRECONNECTED
+- token: AAAABBBB
+- token_local: BBBB
+- token_remote: CCCC
+- socket: 2
+```
+
+12. CLIENT sends `AAAABBBB`
+13. SERVER1 becomes as CONNECTED
+14. SERVER1 gets socket from SERVER2
+15. We delete SERVER2
+
+```
+SERVER1
+- status: CONNECTED
+- token: AAAABBBB
+- token_local: AAAA
+- token_remote: BBBB
+- socket: 2
+SERVER2 (deleted)
+
+CLIENT
+- status: PRECONNECTED
+- token: AAAABBBB
+- token_local: BBBB
+- token_remote: CCCC
+- socket: 2
+```
+
+15. SERVER1 sends `AAAABBBB` to confirm connection on CLIENT
+
+```
+SERVER1
+- status: CONNECTED
+- token: AAAABBBB
+- token_local: AAAA
+- token_remote: BBBB
+- socket: 2
+
+CLIENT
+- status: CONNECTED
+- token: AAAABBBB
+- token_local: BBBB
+- token_remote: CCCC
 - socket: 2
 ```
 
