@@ -21,14 +21,17 @@ test('RECONNECTFAIL TIMEOUT', function(t) {
 
     var nodeServer
     var nodeClient
-    var nodeServersInc = 0
-    var nodeClientsInc = 0
+    var serverConnectInc = 0
+    var clientConnectInc = 0
+    var maxConnections = 5
 
     server.on('connect', function(node) {
-        if (nodeServer === undefined) {
-            t.equal(nodeServer, undefined, 'SERVER 1 CONNECTED')
-        } else {
-            t.notEqual(nodeServer, node, 'SERVER 2 CONNECTED')
+        t.notEqual(
+            nodeServer,
+            node,
+            'SERVER ' + ++serverConnectInc + ' CONNECTED'
+        )
+        if (serverConnectInc >= maxConnections) {
             t.end()
             nodeClient.closeSocket() // avoid reconnections
             server.close() // this must terminate the server
@@ -36,29 +39,42 @@ test('RECONNECTFAIL TIMEOUT', function(t) {
         nodeServer = node
     })
     client.on('connect', function(node) {
-        if (nodeClient === undefined) {
-            t.equal(nodeClient, undefined, 'CLIENT 1 CONNECTED')
+        t.notEqual(
+            nodeServer,
+            node,
+            'CLIENT ' + ++clientConnectInc + ' CONNECTED'
+        )
+        if (clientConnectInc < maxConnections) {
             timeouts()
-        } else {
-            t.notEqual(nodeClient, node, 'CLIENT 2 CONNECTED')
         }
         nodeClient = node
     })
 
     server.on('disconnect', function(node) {
         const nodesByToken = Object.keys(server.nodesByToken).length
-        t.equal(node, nodeServer, 'SERVER disconnect')
+        t.equal(
+            node,
+            nodeServer,
+            'SERVER ' + ++serverConnectInc + ' disconnect'
+        )
         t.equal(nodesByToken, 0, 'server nodesByToken 0')
         t.equal(server.nodesBySocket.size, 0, 'server nodesBySocket 0')
+        t.equal(nodeServer.token, nodeClient.token, 'same tokens')
+        t.equal(nodeServer.status, dop.cons.NODE_STATE_DISCONNECTED)
     })
     server.on('reconnect', function(node) {
         t.equal(false, true, 'SERVER this should not happen') // this should not happen
     })
     client.on('disconnect', function(node) {
         const nodesByToken = Object.keys(client.nodesByToken).length
-        t.equal(node, nodeClient, 'CLIENT disconnect')
+        t.equal(
+            node,
+            nodeClient,
+            'CLIENT ' + ++clientConnectInc + ' disconnect'
+        )
         t.equal(nodesByToken, 0, 'client nodesByToken 0')
         t.equal(client.nodesBySocket.size, 0, 'client nodesBySocket 0')
+        t.equal(nodeClient.status, dop.cons.NODE_STATE_DISCONNECTED)
     })
     client.on('reconnect', function(node) {
         t.equal(false, true, 'CLIENT this should not happen') // this should not happen
