@@ -86,25 +86,21 @@ test('CLIENT trying connect invalid port', function(t) {
     })
 })
 
-test('CLIENT onConnect', function(t) {
+test('onConnect', function(t) {
     port = portOriginal
     reconnect()
-    transportClient.on('connect', function(node) {
-        nodeClient = node
-        socketClient = node.socket
-        t.equal(Object.keys(transportClient.nodesByToken).length, 1)
-        t.equal(transportClient.nodesBySocket.size, 1)
-        t.end()
-    })
-})
-
-test('SERVER onConnect', function(t) {
     transportServer.on('connect', function(node) {
         nodeServer = node
         socketServer = node.socket
-        t.equal(nodeServer.token, nodeClient.token)
         t.equal(Object.keys(transportServer.nodesByToken).length, 1)
         t.equal(transportServer.nodesBySocket.size, 1)
+    })
+    transportClient.on('connect', function(node) {
+        nodeClient = node
+        socketClient = node.socket
+        t.equal(nodeServer.token, nodeClient.token)
+        t.equal(Object.keys(transportClient.nodesByToken).length, 1)
+        t.equal(transportClient.nodesBySocket.size, 1)
         nodeClient.socket.close()
         t.end()
     })
