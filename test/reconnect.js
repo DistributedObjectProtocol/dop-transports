@@ -1,5 +1,5 @@
 var test = require('tape')
-var dop = require('../dop')
+var dop = require('dop')
 var dopServer = dop.create()
 var dopClient = dop.create()
 dopServer.env = 'SERVER'
