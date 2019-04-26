@@ -11,7 +11,7 @@ var transportConnect = require('../').connect[transportName]
 test('QUEUE TEST', function(t) {
     var server = dopServer.listen({ transport: transportListen })
     var client = dopClient.connect({
-        timeoutReconnect: 0.1,
+        timeoutReconnect: 100,
         transport: transportConnect,
         listener: server
     })

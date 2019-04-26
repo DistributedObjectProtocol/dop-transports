@@ -57,15 +57,11 @@ CLIENT
 SERVER
 - status: CONNECTED
 - token: AAAABBBB
-- token_local: AAAA
-- token_remote: BBBB
 - socket: 1
 
 CLIENT
 - status: CONNECTED
 - token: AAAABBBB
-- token_local: BBBB
-- token_remote: AAAA
 - socket: 1
 ```
 
@@ -78,8 +74,6 @@ CLIENT
 SERVER1
 - status: RECONNECTING
 - token: AAAABBBB
-- token_local: AAAA
-- token_remote: BBBB
 - socket: 1 (closed)
 SERVER2
 - status: OPEN
@@ -89,8 +83,6 @@ SERVER2
 CLIENT
 - status: RECONNECTING
 - token: AAAABBBB
-- token_local: BBBB
-- token_remote: AAAA
 - socket: 2
 ```
 
@@ -101,8 +93,6 @@ CLIENT
 SERVER1
 - status: RECONNECTING
 - token: AAAABBBB
-- token_local: AAAA
-- token_remote: BBBB
 - socket: 1 (closed)
 SERVER2
 - status: OPEN
@@ -112,8 +102,6 @@ SERVER2
 CLIENT
 - status: PRECONNECTED
 - token: AAAABBBB
-- token_local: BBBB
-- token_remote: CCCC
 - socket: 2
 ```
 
@@ -126,16 +114,12 @@ CLIENT
 SERVER1
 - status: CONNECTED
 - token: AAAABBBB
-- token_local: AAAA
-- token_remote: BBBB
 - socket: 2
 SERVER2 (deleted)
 
 CLIENT
 - status: PRECONNECTED
 - token: AAAABBBB
-- token_local: BBBB
-- token_remote: CCCC
 - socket: 2
 ```
 
@@ -145,37 +129,116 @@ CLIENT
 SERVER1
 - status: CONNECTED
 - token: AAAABBBB
-- token_local: AAAA
-- token_remote: BBBB
 - socket: 2
 
 CLIENT
 - status: CONNECTED
 - token: AAAABBBB
-- token_local: BBBB
-- token_remote: CCCC
 - socket: 2
 ```
 
-<!--
-## DISCONNECTION
+# RECONNECTION FAILS AND BECOME A NEW CONNECTION
 
-9. If any node sends the `token` as instructions means is a formal disconnection. And can't be recovered.
-10. CLIENT sends `AAAABBBB`
+15. Socket is closed and SERVER1 is deleted because of the timeout/garbage collector.
+16. CLIENT will try to reconnect opening a new Socket
+17. Server creates another node
 
 ```
-SERVER
-- status: DISCONNECTED
-- token: AAAABBBB
-- token_local: AAAA
-- token_remote: BBBB
-- socket: 1 (closed)
+SERVER1 (deleted)
+SERVER2
+- status: OPEN
+- token_local: DDDD
+- socket: 3
 
 CLIENT
-- status: DISCONNECTED
+- status: RECONNECTING
 - token: AAAABBBB
-- token_local: BBBB
-- token_remote: AAAA
-- socket: 1 (closed)
+- socket: 3
 ```
--->
+
+18. SERVER2 sends `DDDD`
+19. CLIENT is PRECONNECTING
+20. CLIENT sends `AAAABBBB`
+
+```
+SERVER2
+- status: OPEN
+- token_local: DDDD
+- token_remote: AAAABBBB
+- socket: 3
+
+CLIENT
+- status: RECONNECTING
+- token_local: AAAABBBB
+- token_remote: DDDD
+- socket: 3
+```
+
+21. CLIENT is now PRECONNECTED
+22. SERVER2 is now PRECONNECTED
+23. SERVER2 sends again `DDDD`
+
+```
+SERVER2
+- status: PRECONNECTED
+- token_local: DDDD
+- token_remote: AAAABBBB
+- socket: 3
+
+CLIENT
+- status: PRECONNECTED
+- token_local: AAAABBBB
+- token_remote: DDDD
+- socket: 3
+```
+
+24. CLIENT creates another node and transfer socket
+25. CLIENT2 sends again `AAAABBBB`
+
+```
+SERVER2
+- status: PRECONNECTED
+- token_local: DDDD
+- token_remote: AAAABBBB
+- socket: 3
+
+CLIENT1 (deleted)
+- status: PRECONNECTED
+- token_local: AAAABBBB
+CLIENT2
+- status: CONNECTED
+- token: AAAADDDD
+- socket: 3
+```
+
+25. SERVER2 is now connected
+
+```
+SERVER2
+- status: CONNECTED
+- token: AAAADDDD
+- socket: 3
+
+CLIENT1 (deleted)
+CLIENT2
+- status: CONNECTED
+- token: AAAADDDD
+- socket: 3
+```
+
+## DISCONNECTION
+
+26. If any node sends the `token` as instructions means is a formal disconnection. And can't be recovered.
+27. CLIENT sends `AAAADDDD`
+
+```
+SERVER2
+- status: DISCONNECTED
+- token: AAAADDDD
+- socket: 3 (closed)
+
+CLIENT2
+- status: DISCONNECTED
+- token: AAAADDDD
+- socket: 3 (closed)
+```

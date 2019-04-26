@@ -9,13 +9,12 @@ const transportName = process.argv[2] || 'local'
 const transportListen = require('../').listen[transportName]
 const transportConnect = require('../').connect[transportName]
 
-test('RECONNECTFAIL TIMEOUT', function(t) {
+test('RECONNECT BECOMES A CONNECTION', function(t) {
     var server = dopServer.listen({
         transport: transportListen
     })
     var client = dopClient.connect({
         transport: transportConnect,
-        timeoutReconnect: 1,
         listener: server
     })
 
