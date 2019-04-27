@@ -1,6 +1,6 @@
 var test = require('tape')
 var WebSocket = require('ws')
-var dop = require('dop').create()
+var dop = require('dop')
 var dopServer = dop.create()
 var dopClient = dop.create()
 dopServer.env = 'SERVER'
@@ -93,14 +93,14 @@ test('onConnect', function(t) {
         nodeServer = node
         socketServer = node.socket
         t.equal(Object.keys(transportServer.nodesByToken).length, 1)
-        t.equal(transportServer.nodesBySocket.size, 1)
+        // t.equal(transportServer.nodesBySocket.size, 1)
     })
     transportClient.on('connect', function(node) {
         nodeClient = node
         socketClient = node.socket
         t.equal(nodeServer.token, nodeClient.token)
         t.equal(Object.keys(transportClient.nodesByToken).length, 1)
-        t.equal(transportClient.nodesBySocket.size, 1)
+        // t.equal(transportClient.nodesBySocket.size, 1)
         nodeClient.socket.close()
         t.end()
     })
@@ -111,7 +111,7 @@ test('SERVER onReconnect', function(t) {
         t.equal(nodeServer, node)
         t.notEqual(nodeServer.socket, socketServer)
         t.equal(Object.keys(transportServer.nodesByToken).length, 1)
-        t.equal(transportServer.nodesBySocket.size, 1)
+        // t.equal(transportServer.nodesBySocket.size, 1)
         t.end()
     })
 })
@@ -121,7 +121,7 @@ test('CLIENT onReconnect', function(t) {
         t.equal(nodeClient, node)
         t.notEqual(nodeClient.socket, socketClient)
         t.equal(Object.keys(transportClient.nodesByToken).length, 1)
-        t.equal(transportClient.nodesBySocket.size, 1)
+        // t.equal(transportClient.nodesBySocket.size, 1)
         t.end()
     })
 })

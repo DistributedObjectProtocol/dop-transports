@@ -47,7 +47,7 @@ function logic(t, isServer) {
         t.equal(nodeServer.status, dop.cons.NODE_STATE_DISCONNECTED)
         t.equal(node, nodeServer, 'SERVER disconnect')
         t.equal(nodesByToken, 0, 'server nodesByToken 0')
-        t.equal(server.nodesBySocket.size, 0, 'server nodesBySocket 0')
+        // t.equal(server.nodesBySocket.size, 0, 'server nodesBySocket 0')
         if (!isServer) {
             server.close()
             t.end()
@@ -62,7 +62,7 @@ function logic(t, isServer) {
         t.equal(nodeClient.status, dop.cons.NODE_STATE_DISCONNECTED)
         t.equal(node, nodeClient, 'CLIENT disconnect')
         t.equal(nodesByToken, 0, 'client nodesByToken 0')
-        t.equal(client.nodesBySocket.size, 0, 'client nodesBySocket 0')
+        // t.equal(client.nodesBySocket.size, 0, 'client nodesBySocket 0')
         if (isServer) {
             server.close()
             t.end()
