@@ -27,8 +27,7 @@ function ws(dop, options) {
             }
             return false
         }
-        transport.onCreate(socket, send, socket.close.bind(socket))
-        transport.onOpen(socket)
+        transport.onOpen(socket, send, socket.close.bind(socket))
         socket.on('message', function(message) {
             transport.onMessage(socket, message)
         })

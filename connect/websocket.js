@@ -39,13 +39,11 @@
                 keep_reconnecting = false
                 socket.close()
             }
-            transport.socket = socket
-            transport.onCreate(socket, send, close, reconnect)
             socket.addEventListener('open', function() {
                 if (socket_old === undefined) {
-                    transport.onOpen(socket)
+                    transport.onOpen(socket, send, close)
                 } else {
-                    transport.onReconnect(socket_old, socket)
+                    transport.onReconnect(socket_old, socket, send, close)
                 }
             })
             socket.addEventListener('message', function(message) {
