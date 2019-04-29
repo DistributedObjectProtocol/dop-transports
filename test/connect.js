@@ -5,7 +5,7 @@ var dopClient = dop.create()
 dopServer.env = 'SERVER'
 dopClient.env = 'CLIENT'
 
-var transportName = process.argv[2] || 'local'
+var transportName = process.argv[2] || 'development'
 var transportListen = require('../').listen[transportName]
 var transportConnect = require('../').connect[transportName]
 

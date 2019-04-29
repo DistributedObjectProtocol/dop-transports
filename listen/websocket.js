@@ -19,7 +19,6 @@ function ws(dop, options) {
         ws_server, //                       transport.socket = ws_server
         ws_server.close.bind(ws_server) //  transport.close = ws_server.close.bind(ws_server)
     )
-
     ws_server.on('connection', function(socket) {
         function send(message) {
             if (socket.readyState === 1) {
@@ -28,7 +27,8 @@ function ws(dop, options) {
             }
             return false
         }
-        transport.onOpen(socket, send, socket.close.bind(socket))
+        transport.onCreate(socket, send, socket.close.bind(socket))
+        transport.onOpen(socket)
         socket.on('message', function(message) {
             transport.onMessage(socket, message)
         })

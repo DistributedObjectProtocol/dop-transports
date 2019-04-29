@@ -5,7 +5,7 @@ const dopClient = dop.create()
 dopServer.env = 'SERVER'
 dopClient.env = 'CLIENT'
 
-const transportName = process.argv[2] || 'local'
+const transportName = process.argv[2] || 'development'
 const transportListen = require('../').listen[transportName]
 const transportConnect = require('../').connect[transportName]
 

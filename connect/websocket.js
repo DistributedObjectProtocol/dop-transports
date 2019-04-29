@@ -25,43 +25,42 @@
 
         var transport = dop.createTransport()
         var WebSocket = options.transport.getApi()
-        var ws_client
-        ;(function reconnect(ws_client_old) {
+        ;(function reconnect(socket_old) {
             var keep_reconnecting = true
-            var temp_ws_client = new WebSocket(url)
+            var socket = new WebSocket(url)
             var send = function(message) {
-                if (ws_client.readyState === 1) {
-                    ws_client.send(message)
+                if (socket.readyState === 1) {
+                    socket.send(message)
                     return true
                 }
                 return false
             }
             var close = function() {
                 keep_reconnecting = false
-                ws_client.close()
+                socket.close()
             }
-            transport.socket = ws_client
-            temp_ws_client.addEventListener('open', function() {
-                ws_client = temp_ws_client
-                if (ws_client_old === undefined) {
-                    transport.onOpen(ws_client, send, close)
+            transport.socket = socket
+            transport.onCreate(socket, send, close, reconnect)
+            socket.addEventListener('open', function() {
+                if (socket_old === undefined) {
+                    transport.onOpen(socket)
                 } else {
-                    transport.onReconnect(ws_client_old, ws_client, send, close)
+                    transport.onReconnect(socket_old, socket)
                 }
             })
-            temp_ws_client.addEventListener('message', function(message) {
-                transport.onMessage(ws_client, message.data)
+            socket.addEventListener('message', function(message) {
+                transport.onMessage(socket, message.data)
             })
-            temp_ws_client.addEventListener('close', function() {
-                transport.onClose(ws_client)
+            socket.addEventListener('close', function() {
+                transport.onClose(socket)
                 if (keep_reconnecting) {
                     setTimeout(function() {
-                        reconnect(ws_client)
+                        reconnect(socket)
                     }, options.timeoutReconnect)
                 }
             })
-            temp_ws_client.addEventListener('error', function(error) {
-                transport.onError(ws_client, error)
+            socket.addEventListener('error', function(error) {
+                transport.onError(socket, error)
             })
         })()
 

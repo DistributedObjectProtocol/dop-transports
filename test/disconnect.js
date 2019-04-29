@@ -1,7 +1,7 @@
 const test = require('tape')
 const dop = require('dop').create()
 
-const transportName = process.argv[2] || 'local'
+const transportName = process.argv[2] || 'development'
 const transportListen = require('../').listen[transportName]
 const transportConnect = require('../').connect[transportName]
 
