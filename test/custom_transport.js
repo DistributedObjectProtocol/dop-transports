@@ -34,39 +34,41 @@ wsServer.on('connection', function(socket) {
 })
 
 // CLIENT
-function reconnect(wsClientOld) {
+function reconnect(socket_closed) {
     var keepReconnecting = true
-    var wsClient = new WebSocket('ws://localhost:' + port)
+    var socket = new WebSocket('ws://localhost:' + port)
+    var socket_open = socket_closed
     var send = function(message) {
-        if (wsClient.readyState === 1) {
-            wsClient.send(message)
+        if (socket.readyState === 1) {
+            socket.send(message)
             return true
         }
         return false
     }
     var close = () => {
         keepReconnecting = false
-        wsClient.close()
+        socket.close()
     }
-    wsClient.addEventListener('open', function() {
-        if (wsClientOld === undefined) {
-            transportClient.onOpen(wsClient, send, close)
+    socket.addEventListener('open', function() {
+        socket_open = socket
+        if (socket_closed === undefined) {
+            transportClient.onOpen(socket, send, close)
         } else {
-            transportClient.onReconnect(wsClientOld, wsClient, send, close)
+            transportClient.onReconnect(socket_closed, socket, send, close)
         }
     })
-    wsClient.addEventListener('message', function(message) {
-        transportClient.onMessage(wsClient, message.data)
+    socket.addEventListener('message', function(message) {
+        transportClient.onMessage(socket, message.data)
     })
-    wsClient.addEventListener('close', function() {
-        transportClient.onClose(wsClient)
-        if (keepReconnecting) reconnect(wsClient)
+    socket.addEventListener('close', function() {
+        transportClient.onClose(socket)
+        if (keepReconnecting) reconnect(socket_open)
     })
-    wsClient.addEventListener('error', function(error) {
+    socket.addEventListener('error', function(error) {
         keepReconnecting = false
-        transportClient.onError(wsClient, error)
+        transportClient.onError(socket, error)
     })
-    return wsClient
+    return socket
 }
 
 transportServer.type = 'SERVER'
@@ -78,9 +80,9 @@ var socketClient
 var socketServer
 test('CLIENT trying connect invalid port', function(t) {
     port = 2131
-    var wsClient = reconnect()
+    var socket = reconnect()
     transportClient.on('error', function(socket, error) {
-        t.equal(socket, wsClient)
+        t.equal(socket, socket)
         t.notEqual(error, undefined)
         t.end()
     })
@@ -127,11 +129,11 @@ test('CLIENT onReconnect', function(t) {
 })
 
 test('CHEATING CONNECTION MUST CLOSE THE SOCKET', function(t) {
-    var wsClient = new WebSocket('ws://localhost:' + port)
-    wsClient.on('open', function() {
-        wsClient.send(nodeClient.token)
+    var socket = new WebSocket('ws://localhost:' + port)
+    socket.on('open', function() {
+        socket.send(nodeClient.token)
     })
-    wsClient.on('close', function() {
+    socket.on('close', function() {
         t.equal(true, true)
         t.end()
     })
