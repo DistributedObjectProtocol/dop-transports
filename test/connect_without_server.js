@@ -34,8 +34,8 @@ test('RECONNECT AFTER SERVER CLOSE', function(t) {
         t.equal(typeof socket, 'object', 'CLIENT onerror')
     })
 
-    client.on('close', function(node) {
-        t.equal(node.status, dop.cons.NODE_STATE_RECONNECTING, 'CLIENT close')
+    client.on('close', function(socket) {
+        t.equal(typeof socket, 'object', 'CLIENT onclose')
     })
 
     client.on('disconnect', function(node) {

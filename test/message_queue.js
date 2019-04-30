@@ -31,23 +31,23 @@ test('QUEUE TEST', function(t) {
 
     server.on('connect', function(node) {
         nodeServer = node
+        node.on('message', function(message) {
+            t.equal(message, String(incS), 'SERVER message `' + message + '`')
+            incS += 1
+            if (incS === maxMsg && incC === maxMsg) {
+                t.end()
+                nodeClient.closeSocket() // avoid reconnections
+                server.close()
+            }
+        })
     })
     client.on('connect', function(node) {
         nodeClient = node
+        node.on('message', function(message) {
+            t.equal(message, String(incC), 'CLIENT message `' + message + '`')
+            incC += 1
+        })
         send()
-    })
-    client.on('message', function(node, message) {
-        t.equal(message, String(incC), 'CLIENT message `' + message + '`')
-        incC += 1
-    })
-    server.on('message', function(node, message) {
-        t.equal(message, String(incS), 'SERVER message `' + message + '`')
-        incS += 1
-        if (incS === maxMsg && incC === maxMsg) {
-            t.end()
-            nodeClient.closeSocket() // avoid reconnections
-            server.close()
-        }
     })
 
     setTimeout(function() {
