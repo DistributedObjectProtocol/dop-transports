@@ -27,15 +27,16 @@ function ws(dop, options) {
             }
             return false
         }
-        transport.onOpen(socket, send, socket.close.bind(socket))
+        var node = transport.onCreate(socket, send, socket.close.bind(socket))
+        transport.onOpen(node)
         socket.on('message', function(message) {
-            transport.onMessage(socket, message)
+            transport.onMessage(node, message)
         })
         socket.on('close', function() {
-            transport.onClose(socket)
+            transport.onClose(node)
         })
         socket.on('error', function(error) {
-            transport.onError(socket, error)
+            transport.onError(node, error)
         })
     })
 

@@ -5,11 +5,11 @@ const transportName = process.argv[2] || 'development'
 const transportListen = require('../').listen[transportName]
 const transportConnect = require('../').connect[transportName]
 
-test('SERVER DISCONNECT()', function(t) {
+test('SERVER disconnect()', function(t) {
     logic(t, true)
 })
 
-test('CLIENT DISCONNECT()', function(t) {
+test('CLIENT disconnect()', function(t) {
     logic(t, false)
 })
 
@@ -29,14 +29,14 @@ function logic(t, isServer) {
     var nodeServer
     var nodeClient
     server.on('connect', function(node) {
-        t.test(nodeServer, undefined)
+        t.equal(nodeServer, undefined, 'SERVER connect')
         nodeServer = node
     })
     client.on('connect', function(node) {
-        t.test(nodeClient, undefined)
+        t.equal(nodeClient, undefined, 'CLIENT connect')
         nodeClient = node
         if (isServer) {
-            node.disconnect()
+            nodeServer.disconnect()
         } else {
             nodeClient.disconnect()
         }
@@ -44,29 +44,28 @@ function logic(t, isServer) {
 
     server.on('disconnect', function(node) {
         const nodesByToken = Object.keys(server.nodesByToken).length
-        t.equal(nodeServer.status, dop.cons.NODE_STATE_DISCONNECTED)
         t.equal(node, nodeServer, 'SERVER disconnect')
+        t.equal(node.status, dop.cons.NODE_STATE_DISCONNECTED)
         t.equal(nodesByToken, 0, 'server nodesByToken 0')
-        // t.equal(server.nodesBySocket.size, 0, 'server nodesBySocket 0')
         if (!isServer) {
             server.close()
             t.end()
         }
     })
-    server.on('reconnect', function() {
-        t.equal(false, true, 'SERVER this should not happen') // this should not happen
-    })
 
     client.on('disconnect', function(node) {
         const nodesByToken = Object.keys(client.nodesByToken).length
-        t.equal(nodeClient.status, dop.cons.NODE_STATE_DISCONNECTED)
         t.equal(node, nodeClient, 'CLIENT disconnect')
+        t.equal(node.status, dop.cons.NODE_STATE_DISCONNECTED)
         t.equal(nodesByToken, 0, 'client nodesByToken 0')
-        // t.equal(client.nodesBySocket.size, 0, 'client nodesBySocket 0')
         if (isServer) {
             server.close()
             t.end()
         }
+    })
+
+    server.on('reconnect', function() {
+        t.equal(false, true, 'SERVER this should not happen') // this should not happen
     })
     client.on('reconnect', function() {
         t.equal(false, true, 'CLIENT this should not happen') // this should not happen
