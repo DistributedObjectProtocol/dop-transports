@@ -19,9 +19,6 @@
                 '/' +
                 dop.name
         }
-        if (typeof options.timeoutReconnect != 'number') {
-            options.timeoutReconnect = 1000 // ms
-        }
 
         var transport = dop.createTransport()
         var WebSocket = options.transport.getApi()
