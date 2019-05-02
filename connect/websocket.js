@@ -25,27 +25,23 @@
 
         var transport = dop.createTransport()
         var WebSocket = options.transport.getApi()
-        ;(function reconnect(node_closed) {
+        ;(function reconnect() {
             var socket = new WebSocket(url)
-            var send = function(message) {
-                if (socket.readyState === 1) {
-                    socket.send(message)
-                    return true
-                }
-                return false
+            function send(message) {
+                socket.send(message)
             }
-            var close = function() {
+            function disconnect() {
                 socket.close()
             }
-            var node = transport.onCreate(socket, send, close, reconnect)
+            var node = transport.onCreate(socket, send, disconnect)
             socket.addEventListener('open', function() {
-                transport.onOpen(node, node_closed)
+                transport.onConnect(node)
             })
             socket.addEventListener('message', function(message) {
                 transport.onMessage(node, message.data)
             })
             socket.addEventListener('close', function() {
-                transport.onClose(node)
+                transport.onDisconnect(node)
             })
             socket.addEventListener('error', function(error) {
                 transport.onError(node, error)

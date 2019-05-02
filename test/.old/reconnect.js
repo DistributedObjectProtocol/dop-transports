@@ -24,7 +24,7 @@ test('RECONNECT TEST', function(t) {
         tokenClient
 
     server.on('connect', function(node) {
-        t.equal(nodeServer, undefined)
+        t.equal(nodeServer, undefined, 'SERVER connect')
         nodeServer = node
         socketServer = node.socket
         tokenServer = node.token
@@ -35,10 +35,19 @@ test('RECONNECT TEST', function(t) {
         }, 500)
     })
     client.on('connect', function(node) {
-        t.equal(nodeClient, undefined)
+        t.equal(nodeClient, undefined, 'CLIENT connect')
         nodeClient = node
         socketClient = node.socket
         tokenClient = node.token
+    })
+
+    server.on('reconnecting', function(node) {
+        t.equal(nodeServer, node, 'SERVER reconnecting')
+    })
+
+    client.on('reconnecting', function(node) {
+        t.equal(nodeClient, node, 'CLIENT reconnecting')
+        node.reconnect()
     })
 
     server.on('reconnect', function(node) {

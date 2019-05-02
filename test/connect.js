@@ -22,11 +22,14 @@ test('CONNECT TEST', function(t) {
         t.equal(true, true, 'SERVER connect')
     })
     client.on('connect', function(node) {
-        t.equal(nodeServer.token, node.token, 'CLIENT connect')
-        t.equal(nodeServer.status, dop.cons.NODE_STATE_CONNECTED)
-        t.equal(node.status, dop.cons.NODE_STATE_CONNECTED)
-        node.closeSocket() // avoid reconnections
-        server.close() // this must terminate the server
+        t.equal(
+            nodeServer.status,
+            dop.cons.NODE_STATUS_CONNECTED,
+            'CLIENT connect'
+        )
+        t.equal(node.status, dop.cons.NODE_STATUS_CONNECTED)
+        node.disconnect() // avoid reconnections
+        server.socket.close() // this must terminate the server
         t.end()
     })
 })

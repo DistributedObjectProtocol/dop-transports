@@ -59,7 +59,7 @@ test('RECONNECT BECOMES A CONNECTION', function(t) {
         t.equal(nodesByToken, 0, 'server nodesByToken 0')
         // t.equal(server.nodesBySocket.size, 0, 'server nodesBySocket 0')
         t.equal(nodeServer.token, nodeClient.token, 'same tokens')
-        t.equal(nodeServer.status, dop.cons.NODE_STATE_DISCONNECTED)
+        t.equal(nodeServer.status, dop.cons.NODE_STATUS_DISCONNECTED)
     })
     server.on('reconnect', function(node) {
         t.equal(false, true, 'SERVER this should not happen') // this should not happen
@@ -73,7 +73,7 @@ test('RECONNECT BECOMES A CONNECTION', function(t) {
         )
         t.equal(nodesByToken, 0, 'client nodesByToken 0')
         // t.equal(client.nodesBySocket.size, 0, 'client nodesBySocket 0')
-        t.equal(nodeClient.status, dop.cons.NODE_STATE_DISCONNECTED)
+        t.equal(nodeClient.status, dop.cons.NODE_STATUS_DISCONNECTED)
     })
     client.on('reconnect', function(node) {
         t.equal(false, true, 'CLIENT this should not happen') // this should not happen

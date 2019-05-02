@@ -43,23 +43,19 @@ function logic(t, isServer) {
     })
 
     server.on('disconnect', function(node) {
-        const nodesByToken = Object.keys(server.nodesByToken).length
         t.equal(node, nodeServer, 'SERVER disconnect')
-        t.equal(node.status, dop.cons.NODE_STATE_DISCONNECTED)
-        t.equal(nodesByToken, 0, 'server nodesByToken 0')
+        t.equal(node.status, dop.cons.NODE_STATUS_DISCONNECTED)
         if (!isServer) {
-            server.close()
+            server.socket.close()
             t.end()
         }
     })
 
     client.on('disconnect', function(node) {
-        const nodesByToken = Object.keys(client.nodesByToken).length
         t.equal(node, nodeClient, 'CLIENT disconnect')
-        t.equal(node.status, dop.cons.NODE_STATE_DISCONNECTED)
-        t.equal(nodesByToken, 0, 'client nodesByToken 0')
+        t.equal(node.status, dop.cons.NODE_STATUS_DISCONNECTED)
         if (isServer) {
-            server.close()
+            server.socket.close()
             t.end()
         }
     })

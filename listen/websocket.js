@@ -15,25 +15,21 @@ function ws(dop, options) {
 
     var WebSocketServer = options.transport.getApi()
     var ws_server = new WebSocketServer(options)
-    var transport = dop.createTransport(
-        ws_server, //                       transport.socket = ws_server
-        ws_server.close.bind(ws_server) //  transport.close = ws_server.close.bind(ws_server)
-    )
+    var transport = dop.createTransport(ws_server)
     ws_server.on('connection', function(socket) {
         function send(message) {
-            if (socket.readyState === 1) {
-                socket.send(message)
-                return true
-            }
-            return false
+            socket.send(message)
         }
-        var node = transport.onCreate(socket, send, socket.close.bind(socket))
-        transport.onOpen(node)
+        function disconnect() {
+            socket.close()
+        }
+        var node = transport.onCreate(socket, send, disconnect)
+        transport.onConnect(node)
         socket.on('message', function(message) {
             transport.onMessage(node, message)
         })
         socket.on('close', function() {
-            transport.onClose(node)
+            transport.onDisconnect(node)
         })
         socket.on('error', function(error) {
             transport.onError(node, error)

@@ -45,7 +45,7 @@ test('RECONNECT AFTER SERVER CLOSE', function(t) {
     client.on('reconnect', function(node) {
         t.equal(
             node.status,
-            dop.cons.NODE_STATE_CONNECTED,
+            dop.cons.NODE_STATUS_CONNECTED,
             'CLIENT onreconnect'
         )
         t.equal(node, nodeClient)
