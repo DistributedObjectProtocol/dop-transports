@@ -18,7 +18,11 @@ function ws(dop, options) {
     var transport = dop.createTransport(ws_server)
     ws_server.on('connection', function(socket) {
         function send(message) {
-            socket.send(message)
+            if (socket.readyState === 1) {
+                socket.send(message)
+                return true
+            }
+            return false
         }
         function disconnect() {
             socket.close()
